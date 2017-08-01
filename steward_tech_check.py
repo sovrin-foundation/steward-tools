@@ -320,7 +320,7 @@ class Node:
             mount_list=mounts.readlines()
             for m in mount_list:
                 device,mount_point,fs,opts,d,co = m.strip().split()
-                if path == mount_point:
+                if device[0] == '/' and path == mount_point:
                     dev = device
                     break
         return dev
@@ -333,13 +333,13 @@ class Node:
         return dev
 
     def get_storage_size_for_path(self,path):
-        dev = self.get_dev_for_path(path)
-        return self.get_storage_size(dev)
+        mount = self.mount_for_path(path)
+        return self.get_storage_size(mount)
 
-    def get_storage_size(self,dev):
+    def get_storage_size(self,mount):
         df_paths = ['/usr/bin/df','/bin/df']
         size = -1
-        s = self._run_cmd(df_paths,['-k',dev])
+        s = self._run_cmd(df_paths,['-k',mount])
         if s[0] == 0:
             size = int(s[1][1].strip().split()[1]) * 1024
         return size
