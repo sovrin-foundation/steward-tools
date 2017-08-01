@@ -314,6 +314,9 @@ class Node:
             cpath = os.path.dirname(cpath)
         return cpath
 
+    def path_exists(self,path):
+        return os.path.exists(path)
+
     def get_dev_for_mount(self,path):
         dev = None
         with open("/proc/mounts","r") as mounts:
@@ -837,9 +840,33 @@ class RuleValidator:
                     res['details'].append("{}: Found enough memory: {}".format(r,memory))
             elif r == "disk":
                 try:
-                    d_size  = self.node.get_storage_size_for_path(
+                    d_mount = self.node.mount_for_path(
                         criteria['resources'][r]['path']
                     )
+                    d_dev = self.node.get_dev_for_mount(d_mount)
+                    d_size = self.node.get_storage_size(d_mount)
+                    path_exists = self.node.path_exists(criteria['resources'][r]['path'])
+                    if path_exists:
+                        res['details'].append(
+                            "{}: Found path: {} exists".format(
+                                r,
+                                criteria['resources'][r]['path']
+                            )
+                        )
+                    else:
+                        res['result'] = bcolors.FAIL + "FAILED" + bcolors.ENDC
+                        res['details'].append(
+                            "{}: Path: {} NOT found".format(
+                                r,
+                                criteria['resources'][r]['path']
+                            )
+                        )
+                        res['action_needed'].append(
+                            "{}: Create path: {}".format(
+                                r,
+                                criteria['resources'][r]['path']
+                            )
+                        )
                     if not self._comp_exec(
                         d_size,
                         criteria['resources'][r]['size'],
@@ -849,14 +876,18 @@ class RuleValidator:
                             er = False
                         res['result'] = bcolors.FAIL + "FAILED" + bcolors.ENDC
                         res['details'].append(
-                            "{}: Not enough storage space for path: {}, only found: {} bytes".format(
+                            "{}: Not enough storage space for path: {} mounted at: {} from device: {}. Only found: {} bytes".format(
                                 r,
                                 criteria['resources'][r]['path'],
+                                d_mount,
+                                d_dev,
                                 d_size
                             )
                         )
-                        res['action_needed'].append("Change storage space for path: {} for be: {}".format(
+                        res['action_needed'].append("Change storage space for path: {} mounted at: {} from device: {} to be {}".format(
                                 criteria['resources'][r]['path'],
+                                d_mount,
+                                d_dev,
                                 criteria['resources'][r]['size']
                             )
                         )
