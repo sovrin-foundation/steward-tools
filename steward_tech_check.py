@@ -320,7 +320,7 @@ class Node:
             mount_list=mounts.readlines()
             for m in mount_list:
                 device,mount_point,fs,opts,d,co = m.strip().split()
-                if path == mount_point:
+                if device[0] == '/' and path == mount_point:
                     dev = device
                     break
         return dev
