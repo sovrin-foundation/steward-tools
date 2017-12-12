@@ -3,6 +3,7 @@ import os
 import sys
 import platform
 import subprocess
+import re
 
 #Rules definition takes care of the following item in 7.1 of:
 # https://sovrin.org/wp-content/uploads/2017/06/SovrinProvisionalTrustFramework2017-03-22.pdf
@@ -178,7 +179,6 @@ class Node:
         self.os_name = self._get_os_name()
         self.os_vers = float(self.os_info['VERSION_ID'])
         self.os_type = self.os_info['TYPE']
-        self.vendor = self._get_vendor()
         self.memory = self._get_memory()
         self.cpu_cores = self._get_cpu_cores()
         self.mach_type = 'Unknown'
@@ -219,11 +219,6 @@ class Node:
         except KeyError:
             return None
 
-    def _get_vendor(self):
-        with open("/sys/class/dmi/id/sys_vendor","r") as sys_vendor_file:
-            sys_vendor=sys_vendor_file.readline().strip()
-            return sys_vendor.lower()
-
     def _get_memory(self):
         with open("/proc/meminfo","r") as meminfo:
             mi=meminfo.readline().strip().split()
@@ -238,25 +233,33 @@ class Node:
             return count
 
     def _set_mach_type(self):
-        for vm_id in self.vm_identifiers:
-            if self.vendor.find(vm_id) >= 0:
-                if vm_id == 'innotek':
-                    vm_id = 'VirtualBox'
-                self.is_vm = True
-                self.mach_tech = vm_id.lower()
-                self.mach_type = 'vm'
-                return
-        with open("/proc/1/cgroup","r") as cg:
-            for l in cg.readlines():
-                lsplit = l.strip().split(':')
-                if lsplit[2] == '/':
-                    self.is_metal = True
-                    self.mach_type = 'metal'
-                    self.mach_tech = 'hardware'
-                    return
-            self.is_container = True
-            self.mach_type = 'container'
-            self.mach_tech = lsplit[2].split('/')[1]
+
+        try:
+            output=subprocess.check_output("dmesg | grep 'Detected virtualization'", shell=True)
+        except: 
+            # Not a VM
+            with open("/proc/1/cgroup","r") as cg:
+                for l in cg.readlines():
+                    lsplit = l.strip().split(':')
+                    if lsplit[2] == '/':
+                        self.is_metal = True
+                        self.mach_type = 'metal'
+                        self.mach_tech = 'hardware'
+                        return
+                self.is_container = True
+                self.mach_type = 'container'
+                self.mach_tech = lsplit[2].split('/')[1]                        
+        else:
+            outstr=output.decode()
+            match = re.search("Detected virtualization (.*)\.", outstr)
+            if match.group(1) == 'oracle':
+                vm_id = 'VirtualBox'
+            else:
+                vm_id = match.group(1).strip()
+            self.is_vm = True
+            self.mach_tech = vm_id.lower()
+            self.mach_type = 'vm'
+
 
     def _address_in_network(self,ip, net):
         ipaddr = int(''.join([ '%02x' % int(x) for x in ip.split('.') ]), 16)
