@@ -11,7 +11,7 @@ import re
 #       community. For Linux, less than 2.5 years old
 #       Rule: os_allowed
 #
-# 7.a - Run on a maintsream hypervisor
+# 7.a - Run on a mainstream hypervisor
 #       Rule: machine_type_allowed
 #
 # 8   - Machine is dedicated to the validator, no other services 
@@ -99,7 +99,7 @@ rules = {
             "resources": {
                 "memory": ">= 8589934592",
                 "disk": {
-                    'path': "/home/sovrin",
+                    'path': "/home/indy",
                     'size': ">= 1099511627776",
                     'raid': True
                 },
@@ -111,7 +111,7 @@ rules = {
             'comment': '',
             'processes': [
                 '/usr/sbin/ntpd',
-                '/usr/local/bin/start_sovrin_node'
+                '/usr/local/bin/start_indy_node'
             ]
         },
         "firewalls_allowed": {
@@ -681,11 +681,11 @@ class RuleValidator:
         if 'personel' in criteria["rules"]:
             if self._attest("At least one qualifed adminstrator is assigned to administer the node, and at least one other person has adequate access and training to administer the box in an emergency."):
                 res['result'] = bcolors.OKGREEN + "PASSED" + bcolors.ENDC
-                res['details'].append("Appropriate administrative personel is assigned")
+                res['details'].append("Appropriate administrative personnel is assigned")
             else:
                 res['result'] = bcolors.FAIL + "FAILED" + bcolors.ENDC
-                res['action_needed'].append("Assign qualified adminisrators")
-                res['details'].append("Inadequate administrative personel assigned")
+                res['action_needed'].append("Assign qualified administrators")
+                res['details'].append("Inadequate administrative personnel assigned")
         if 'other_access' in criteria['rules']:
             if self._attest("Persons who are not designated administrators of the validator node have access to the system."):
                 res['result'] = bcolors.FAIL + "FAILED" + bcolors.ENDC
@@ -726,7 +726,7 @@ class RuleValidator:
                 res['details'].append("Node has logical access to internal resources that it should not have access to")
         if 'two_factor' in criteria['rules']:
             if self._attest("Two-factor authentication is required for all access to node."):
-                res['details'].append("Secure authention policies applied")
+                res['details'].append("Secure authenticaton policies applied")
             else:
                 res['result'] = bcolors.FAIL + "FAILED" + bcolors.ENDC
                 res['action_needed'].append("Implement two-factor authentication policy")
@@ -785,7 +785,7 @@ class RuleValidator:
             else:
                 res['result'] = bcolors.FAIL + "FAILED" + bcolors.ENDC
                 res['action_needed'].append("Develop policies and practices for rapid deployment of patches")
-                res['details'].append("Software paches are not appied within a week")
+                res['details'].append("Software patches are not applied within a week")
         return res
 
     def eval_fw_allowed(self,criteria):
