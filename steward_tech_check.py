@@ -99,7 +99,7 @@ rules = {
             "resources": {
                 "memory": ">= 8589934592",
                 "disk": {
-                    'path': "/home/sovrin",
+                    'path': "/home/indy",
                     'size': ">= 1099511627776",
                     'raid': True
                 },
@@ -111,7 +111,7 @@ rules = {
             'comment': '',
             'processes': [
                 '/usr/sbin/ntpd',
-                '/usr/local/bin/start_sovrin_node'
+                '/usr/local/bin/start_indy_node'
             ]
         },
         "firewalls_allowed": {
