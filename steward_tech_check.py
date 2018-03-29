@@ -100,7 +100,7 @@ rules = {
                 "memory": ">= 8589934592",
                 "disk": {
                     'path': "/home/indy",
-                    'size': ">= 1099511627776",
+                    'size': ">= 1000000000000",
                     'raid': True
                 },
                 'hardware': 'attested',
