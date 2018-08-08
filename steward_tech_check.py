@@ -110,7 +110,7 @@ rules = {
         "procs_required": {
             'comment': '',
             'processes': [
-                '/usr/sbin/ntpd',
+                ['/usr/sbin/ntpd', '/lib/systemd/systemd-timesyncd'],
                 '/usr/local/bin/start_indy_node'
             ]
         },
