@@ -1104,18 +1104,20 @@ class RuleValidator:
         }
         cur_procs = self.node.running_procs()
         failed = False
-        for p in criteria['processes']:
+        for processes in criteria['processes']:
             fp = False
             for cp in cur_procs:
-                if p in cp['cmd']:
+                if isinstance(processes, str):
+                    processes = [processes]
+                if cp['cmd'] in processes:
                     fp = True
-                    res['details'].append('Found required proc: {} at pid: {}'.format(p,cp['pid']))
+                    res['details'].append('Found required proc: {} at pid: {}'.format(cp['cmd'],cp['pid']))
                     break
             if not fp:
                 failed = True
                 res['result'] = bcolors.FAIL + 'FAILED' + bcolors.ENDC
-                res['action_needed'].append("Start required process: {}".format(p))
-                res['details'].append("Can't find required process: {}".format(p))
+                res['action_needed'].append("Start required process: {}".format(', '.join(processes)))
+                res['details'].append("Can't find required process: {}".format(', '.join(processes)))
         if not failed:
             res['result'] = bcolors.OKGREEN + "PASSED" + bcolors.ENDC
         return res
