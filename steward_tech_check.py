@@ -52,6 +52,9 @@ rules = {
                 "opensuse": [
                     "VERSION_ID ranges 15-42.0,42.2-42.3"
                 ],
+                "opensuse-leap": [
+                    "VERSION_ID ranges 15-42.0,42.2-42.3"
+                ],
                 "centos": [
                     "VERSION_ID >= 6.0"
                 ],
@@ -478,16 +481,46 @@ class Node:
 
     def listening_ports(self):
         data = {}
+        ss = False
+        ss_to_ns_col = [0,2,3,4,5,1,6]
         if self.os_type == "Linux":
             netstat_path = '/bin/netstat'
+            ss_path = ['/bin/ss', '/usr/bin/ss']
             protos = ['tcp','tcp6','udp', 'udp6']
-            ns_p = self._run_cmd(netstat_path,['-ntulp'])
+            ns_p = (-1,'')
+            if self.path_exists(netstat_path):
+                ns_p = self._run_cmd(netstat_path,['-ntulp'])
+            if ns_p[0] == -1:
+                ns_p = self._run_cmd(ss_path,['-ntulp'])
+                ss = True
+            if ns_p[0] == -1:
+                print("Error, can't find netstat OR ss")
+                return False
             if ns_p[0] == 0:
                 rpc_loaded = False
                 rpc_data = {}
                 for line in ns_p[1]:
                     lsplit = line.strip().split()
                     if len(lsplit) > 1:
+                        #Format ss's output to match netstat's
+                        if ss:
+                            #Make sure we have 7 columns, missing one means no pid/proc name
+                            if len(lsplit) < 7:
+                                lsplit.append('-')
+                            else:
+                                #Skip header row
+                                if lsplit[6] == 'Peer':
+                                    continue
+                                #Format pid/proc like netstat's
+                                ss_p = lsplit[6].replace('users:((','').replace('))','').replace('"','').split(',')
+                                lsplit[6] = '{}/{}'.format(ss_p[1].split('=')[1],ss_p[0])
+                            #Reorder the columns
+                            lsplit = [ lsplit[i] for i in ss_to_ns_col ]
+                            #Replace * with 0.0.0.0, and strip out square brackets
+                            lsplit[3] = lsplit[3].replace('*','0.0.0.0').replace('[','').replace(']','')
+                            #Set proto correctly if ipv6 address
+                            if lsplit[3].count(':') > 1:
+                                lsplit[0]+='6'
                         proto = lsplit[0]
                         if proto in protos:
                             v6 = False
@@ -498,7 +531,7 @@ class Node:
                             lface = lsplit[3].split(':')
                             iface = ':'.join(lface[:-1])
                             port = lface[-1]
-                            if lsplit[5] == 'LISTEN':
+                            if lsplit[5] in [ 'LISTEN', 'UNCONN']:
                                 prog_pid = ' '.join(lsplit[6:]).split('/')
                             else:
                                 prog_pid = ' '.join(lsplit[5:]).split('/')
@@ -1109,7 +1142,7 @@ class RuleValidator:
             for cp in cur_procs:
                 if isinstance(processes, str):
                     processes = [processes]
-                if cp['cmd'] in processes:
+                if cp['cmd'].split()[0] in processes:
                     fp = True
                     res['details'].append('Found required proc: {} at pid: {}'.format(cp['cmd'],cp['pid']))
                     break
@@ -1122,9 +1155,8 @@ class RuleValidator:
             res['result'] = bcolors.OKGREEN + "PASSED" + bcolors.ENDC
         return res
 
-node = Node()
-rule_validator = RuleValidator(rules,node)
-rule_validator.validate()
-rule_validator.print_report()
-
-
+if __name__ == '__main__':
+    node = Node()
+    rule_validator = RuleValidator(rules,node)
+    rule_validator.validate()
+    rule_validator.print_report()
