@@ -12,6 +12,6 @@ sudo chmod 600 /home/indy/logwriter_key
 sudo mv sovrin_logger /etc/cron.d
 sudo chown -R indy:indy /var/log/indy
 sudo chown root:root /etc/cron.d/sovrin_logger
-echo "Please copy this ssh public key (the whole line) and send it to support@sovrin.org:"
-echo ""
+echo 'Please copy this ssh public key (the whole line) and send it to support@sovrin.org:'
+echo ''
 cat ./logwriter_key.pub

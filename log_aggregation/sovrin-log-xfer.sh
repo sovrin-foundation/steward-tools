@@ -1,9 +1,9 @@
 #!/bin/bash
 
 network=$(python3 -c 'import sys; sys.path.append("/etc/indy"); import indy_config; print(indy_config.NETWORK_NAME)')
-ruser="logwriter"
-rpkey="/home/indy/logwriter_key"
-rhost="18.217.23.64"
+ruser='logwriter'
+rpkey='/home/indy/logwriter_key'
+rhost='18.217.23.64'
 ldir="/var/log/indy/${network}/"
 aggdir="${ldir}aggregator/"
 maxLogSize=$(expr 1024 \* 1024)
@@ -54,10 +54,10 @@ connectTime() {
             seconds="${BASH_REMATCH[1]}"
             echo "$seconds"
         else
-            echo "unconnected"
+            echo 'unconnected'
         fi
     else
-        echo "unconnected"
+        echo 'unconnected'
     fi
 }
 
@@ -68,7 +68,7 @@ poolConnectTimes() {
     regex='^([^,]*),([0-9\.]*),([0-9]*)$'
     ./current_validators --writeJson | ./node_address_list | while read -r addLine ; do
         addLine=$(echo $addLine | tr -d "\r")
-        if [[ $addLine != "alias,address,port" ]]
+        if [[ $addLine != 'alias,address,port' ]]
         then
             if [[ $addLine =~ $regex ]]
             then
@@ -106,4 +106,4 @@ rsync -z --progress -a -e "ssh -l ${ruser} -i ${rpkey} -oStrictHostKeyChecking=n
 rsync -z --progress -a -e "ssh -l ${ruser} -i ${rpkey} -oStrictHostKeyChecking=no" "${aggdir}${ruser}"_validator_info.txt* ${rhost}:status/
 rsync -z --progress -a -e "ssh -l ${ruser} -i ${rpkey} -oStrictHostKeyChecking=no" "${aggdir}${ruser}"_pings.txt* ${rhost}:network_health/
 echo "---------------- Log sync to remote complete at $(date --iso-8601=seconds) -------------------" 
-echo ""
+echo ''

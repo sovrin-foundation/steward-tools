@@ -9,8 +9,8 @@ findNodeNum() {
     regex='^([^,]*),([0-9\.]*),([0-9]*)$'
     nodeArray=$(./current_validators --writeJson | ./node_address_list)
     for node in $nodeArray ; do
-        node=$(echo $node | tr -d "\r")
-        if [[ $node != "alias,address,port" ]]
+        node=$(echo $node | tr -d '\r')
+        if [[ $node != 'alias,address,port' ]]
         then
             if [[ $node =~ $regex ]]
             then
