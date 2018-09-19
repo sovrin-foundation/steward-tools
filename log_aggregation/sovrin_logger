@@ -1,0 +1,2 @@
+#Run the log uploader every hour
+1 * * * * indy /home/indy/sovrin-log-xfer.sh >> /home/indy/sovrin-log-xfer.log 2>&1
