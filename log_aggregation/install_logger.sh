@@ -1,3 +1,5 @@
+#! /bin/bash
+
 ssh-keygen -q -f ./logwriter_key -t ed25519 -N ''
 alias=$(./findAlias.sh)
 username=$(cat logwriter_key.pub | cut -d ' ' -f 3 | cut -d '@' -f 1)
