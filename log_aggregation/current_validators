@@ -90,7 +90,7 @@ def parseTransactions(ledger):
 def getLedger():
     command = ['/usr/local/bin/read_ledger', '--type', 'pool', '--count']
     if (getpass.getuser() != 'indy'):
-        command.insert(0, 'sudo')
+        command.insert(0, '/usr/bin/sudo')
     try:
         completed = subprocess.run(
         command,
@@ -104,7 +104,7 @@ def getLedger():
 
     command = ['/usr/local/bin/read_ledger', '--type', 'pool', '--frm', '1', '--to', completed.stdout]
     if (getpass.getuser() != 'indy'):
-        command.insert(0, 'sudo')
+        command.insert(0, '/usr/bin/sudo')
     try:
         completed = subprocess.run(
         command,
