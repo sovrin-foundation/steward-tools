@@ -1,7 +1,7 @@
 #! /bin/bash
 
 /usr/bin/ssh-keygen -q -f ./logwriter_key -t ed25519 -N ''
-alias=$(./findAlias.sh)
+alias=$(sed -n 's/^NODE_NAME=//p' /etc/indy/indy.env)
 username=$(/bin/cat logwriter_key.pub | /usr/bin/cut -d ' ' -f 3 | /usr/bin/cut -d '@' -f 1)
 /bin/sed -i -e "s/^ruser='logwriter'/ruser='${alias}'/" ./sovrin-log-xfer.sh
 /bin/sed -i -e "s/ ${username}@/ ${alias}@/" ./logwriter_key.pub
