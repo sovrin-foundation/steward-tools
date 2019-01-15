@@ -21,10 +21,6 @@ The files in this package are:
         to get o list of nodes to ping, for gathering network performance 
         statistics. This file will be included in the standard indy-node package 
         in a future release.
-    findAlias.sh
-        This is a small utility script that will find the alias of a node. It is
-        used here to write your data to a uniquely named directory on the 
-        aggregation server.
     findNodeNum.sh
         This is a small utility script that will determine which entry number in
         the ledger corresponds to your node. It is used to give a time offset so
