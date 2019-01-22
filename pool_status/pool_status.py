@@ -8,23 +8,28 @@ import codecs
 import copy
 import readline
 import getpass
-import logging
-from logging.handlers import RotatingFileHandler
 from helper_functions import *
+from logging.handlers import RotatingFileHandler
+
 
 log_formatter = logging.Formatter('%(asctime)s %(levelname)-8s %(message)s')
 logFile = 'poolinfo.log'
-my_handler = RotatingFileHandler(logFile, mode='a', maxBytes=1024 * 1024,
+file_handler = RotatingFileHandler(logFile, mode='a', maxBytes=1024 * 1024,
                                  backupCount=1, encoding=None, delay=0)
-my_handler.setFormatter(log_formatter)
-my_handler.setLevel(logging.INFO)
+file_handler.setFormatter(log_formatter)
+file_handler.setLevel(logging.INFO)
 log = logging.getLogger('root')
 log.setLevel(logging.INFO)
-log.addHandler(my_handler)
+log.addHandler(file_handler)
+console_handler=logging.StreamHandler()
+console_handler.setLevel(logging.ERROR)
+log.addHandler(console_handler)
 
 pattern1 = re.compile(r'\\u251c[^ ]*')
 pattern2 = re.compile(r'\\u25cf[^ ]*')
 pattern3 = re.compile(r'\\u2514[^ ]*')
+pool_handle = None
+wallet_handle = None
 
 def remove_json_cruft(line):
     line = codecs.escape_decode(line)[0].decode('ascii', 'ignore')
@@ -36,16 +41,20 @@ def remove_json_cruft(line):
     line = line.replace('\t', '    ')
     return line
 
+
 def get_validator_info(pool, wallet, walletKey, did, genesisFile = None, didSeed = None):
 
+    global pool_handle, wallet_handle
     looper = asyncio.get_event_loop()
     looper.run = looper.run_until_complete
 
-    pool_handle = looper.run(open_pool(pool, genesisFile))
-    wallet_handle = looper.run(open_wallet(wallet, walletKey))
+    if pool_handle == None:
+        pool_handle = looper.run(open_pool(pool, genesisFile))
+    if wallet_handle == None:
+        wallet_handle = looper.run(open_wallet(wallet, walletKey))
     if looper.run(get_did_from_wallet(wallet_handle, did)) == None:
         if didSeed == None:
-            log.error("DID '{}' does not exist in wallet '{}'. A seed must be provided.".format(wallet, did))
+            log.error("DID '{}' does not exist in wallet '{}'. A seed must be provided.".format(did, wallet))
             sys.exit(1)
         else:
             looper.run(store_did(wallet_handle, didSeed))
@@ -59,7 +68,14 @@ def get_validator_info(pool, wallet, walletKey, did, genesisFile = None, didSeed
         if value == 'timeout':
             print("Warning: Node '{}' is unreachable and will be excluded.".format(key))
         else:
-            parsedJson[key] = json.loads(value)['result']['data']
+            parsedValue = json.loads(value)
+            if 'result' in parsedValue:
+                parsedJson[key] = parsedValue['result']['data']
+            elif 'reason' in parsedValue and 'UnauthorizedClientRequest' in parsedValue['reason']:
+                print("Error: You must use steward keys to execute this script")
+                sys.exit(1)
+            else:
+                print("Warning: Status for {} will be excluded due to unexpected result: {}".format(key, value))
     log.info(json.dumps(parsedJson))
     return parsedJson
 
@@ -128,7 +144,7 @@ def find_and_print(info, fields, nodes):
 
 
 def print_help():
-    print('The available commands are nodes, show, save, help, and quit.')
+    print('The available commands are nodes, show, save, reload, help, and quit.')
     print('First use the nodes command to set for which nodes the stats should be displayed.')
     print('   Example: "> nodes validator01,validator02"')
     print('   "nodes all" will display info for all nodes in the pool. (This is the default)')
@@ -138,11 +154,12 @@ def print_help():
     print('   Example: "> show Pool_info/Total_nodes_count"')
     print('   A comma can be used to delimit multiple fields to display')
     print('      Example: "> show transCount,primary"')
+    print('If at some time you want to query the pool to update the status information, use the "reload" command.')
     print('To save the data retrieved from the ledger for later offline analysis with this or other tools, use save.')
     print('   Example: > save myfile.json')
     print("")
 
-commands = ['nodes', 'show', 'save', 'help', 'quit']
+commands = ['nodes', 'show', 'save', 'reload', 'help', 'quit']
 info = {}
 nothing = []
 
@@ -227,13 +244,14 @@ if __name__ == '__main__':
                 valid_nodes = True
                 if command[1] == 'all':
                     nodes = 'all'
-                for node in command[1].split(','):
-                    if node not in info.keys():
-                        print("Unrecognized node '{}'".format(node))
-                        valid_nodes = False
-                        break
-                if valid_nodes:
-                    nodes = command[1]
+                else:
+                    for node in command[1].split(','):
+                        if node not in info.keys():
+                            print("Unrecognized node '{}'".format(node))
+                            valid_nodes = False
+                            break
+                    if valid_nodes:
+                        nodes = command[1]
             else:
                 print('Input error: "nodes" command requires one argument')
         elif action == 'show':
@@ -247,6 +265,9 @@ if __name__ == '__main__':
                     json.dump(info, infoStream)
             else:
                 print('Input error: "save" command requires one argument')
+        elif action == 'reload':
+            print('Please be patient while I contact all the nodes in the pool for their status...')
+            info = get_validator_info(args.pool, args.wallet, walletKey, args.did, args.genesisFile, didSeed)
         elif action == 'help':
             print_help()
         elif action == 'quit':
