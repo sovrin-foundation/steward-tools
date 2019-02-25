@@ -1,0 +1,15 @@
+testnet:
+  indy-node: "1.6.82"
+  sovrin: "1.1.34"
+  libindy: "1.7.0"
+  libnullpay: "1.7.0"
+  libvcx: "0.1.27328536-fb7b7b6"
+  indy-cli: "1.7.0"
+
+mainnet:
+  indy-node: "1.6.82"
+  sovrin: "1.1.6"
+  libindy: "1.7.0"
+  libnullpay: "1.7.0"
+  libvcx: "0.1.27328536-fb7b7b6"
+  indy-cli: "1.7.0"
