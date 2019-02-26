@@ -13,3 +13,5 @@ To run:
 Additional instructions to run are found in example.py.
 
 Rocksdb is used to store the ledger locally, just as it is stored on a node.
+
+This is, in a way, a preliminary version of an unprivileged observer node. It could eventually be added to indy-node.
