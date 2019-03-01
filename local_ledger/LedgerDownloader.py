@@ -6,6 +6,7 @@ import json
 import rocksdb
 import os
 from indy import did, ledger, pool, wallet
+from pprint import pprint
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -16,6 +17,56 @@ class TxnDoesNotExistException(Exception):
 
 class InvalidLedgerResponseException(Exception):
     pass
+
+class Transaction():
+
+    def __init__(self, data):
+        self.data = data
+        self.seqNo = data['txnMetadata']['seqNo']
+
+    def getType(self):
+        return self.data['txn']['type']
+
+    def getTime(self):
+        return self.data['txnMetadata']['txnTime']
+
+    def getSeqNo(self):
+        return self.data['txnMetadata']['seqNo']
+
+    def getSenderDid(self):
+        return self.data['txn']['metadata']['from']
+
+    def print(self):
+        print(json.dumps(self.data, indent=4))
+
+    def printKeys(self):
+        self._printInnerKeys(self.data, 0) 
+
+    def _printInnerKeys(self, d, indentLevel):
+        for key, value in d.items():
+                print(('  ' * indentLevel) + '\'' + str(key) + '\'')
+                if isinstance(value, dict):
+                    self._printInnerKeys(value, indentLevel + 1)
+ 
+
+    def __setitem__(self, key, item):
+        self.data[key] = item
+
+    def __getitem__(self, key):
+        return self.data[key]
+
+    def __repr__(self):
+        return repr(self.data)
+
+    def __str__(self):
+        return str(self.data)
+
+    def __len__(self):
+        return len(self.data)
+
+    def __delitem__(self, key):
+        del self.data[key]
+
 
 
 # TODO: add option to download specific set of transactions instead of all at once
