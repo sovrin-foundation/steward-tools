@@ -22,19 +22,34 @@ class Transaction():
 
     def __init__(self, data):
         self.data = data
-        self.seqNo = data['txnMetadata']['seqNo']
+
+        if 'data' in self.data:
+            print('Wrong format: ') #str(self.getSeqNo()))
+            self.print()
 
     def getType(self):
-        return self.data['txn']['type']
-
+        try:
+            return self.data['txn']['type']
+        except KeyError:
+            return None
+            
     def getTime(self):
-        return self.data['txnMetadata']['txnTime']
+        try:
+            return self.data['txnMetadata']['txnTime']
+        except KeyError:
+            return None
 
     def getSeqNo(self):
-        return self.data['txnMetadata']['seqNo']
+            try:
+                return self.data['txnMetadata']['seqNo']
+        except KeyError:
+            return None
 
     def getSenderDid(self):
-        return self.data['txn']['metadata']['from']
+        try:
+            return self.data['txn']['metadata']['from']
+        except KeyError:
+            return None
 
     def print(self):
         print(json.dumps(self.data, indent=4))
