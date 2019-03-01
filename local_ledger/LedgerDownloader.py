@@ -24,8 +24,8 @@ class Transaction():
         self.data = data
 
         if 'data' in self.data:
-            print('Wrong format: ') #str(self.getSeqNo()))
             self.print()
+            raise Exception('Wrong Transaction format')
 
     def getType(self):
         try:
@@ -40,8 +40,8 @@ class Transaction():
             return None
 
     def getSeqNo(self):
-            try:
-                return self.data['txnMetadata']['seqNo']
+        try:
+            return self.data['txnMetadata']['seqNo']
         except KeyError:
             return None
 
