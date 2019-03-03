@@ -2,15 +2,25 @@
 
 This tool allows you to download a copy of a specified ledger to your local machine. It also provides methods for different types of queries on the local copy.
 
-This tool is still being developed and should not be used in production for the time being.
+This tool is still being developed and should not be used in production for the time being. Downloading an entire ledger's worth of transaction may currently take several hours to complete.
 
-A sample file is provided that downloads the ledger (may take a few hours for now) and then performs simple queries.
+## LocalLedger Object
+
+The LocalLedger Python object can download any indy ledger when provided with a pool to connect to and a did on that ledger. It uses a Rocksdb key-value pair database to store the ledger in a local file. Individual transactions can be retrieved in json via their sequence number.
+
+## LedgerReader Object
+
+The LedgerReader allows more complex querying of a LocalLedger object. For example, a range of transactions by time and date can be queried.
+
+## Example
+
+An example file is provided which demonstrates some of the capabilities of the LocalLedger and LedgerReader objects.
 
 To run: 
 
 ``` python3 example.py [pool to connect to] [wallet] [wallet key] [did]```
 
-Additional instructions to run are found in example.py.
+To use, you must have a pool, wallet, and did set up for the ledger you are trying to connect to. Additional instructions to run are found in example.py.
 
 Rocksdb is used to store the ledger locally, just as it is stored on a node.
 
