@@ -13,13 +13,10 @@ import rocksdb
 from LedgerDownloader import LedgerDownloader
 from LedgerReader import LedgerReader
 
-logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
-
 async def main():
 
     # check arguments
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(fromfile_prefix_chars='@')
     parser.add_argument("pool_name", help="the pool you want to connect to.")
     parser.add_argument("wallet_name", help="wallet name to be used")
     parser.add_argument("wallet_key", help="wallet key for opening the wallet")
@@ -33,9 +30,8 @@ async def main():
     
     lr = LedgerReader(ld)
 
-    print(lr.getTxn(timestamp=1550779433))
-    print('\nNumber of transactions in range:', len(lr.getTxnRange(startTime=1546293228,
-                                                     endTime=1547296228)))
+    print('Last Transaction Received:')
+    print(lr.getTxn(lr.getTxnCount()))
 
     await ld.disconnect()
 

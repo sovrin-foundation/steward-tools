@@ -24,8 +24,10 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 def parseArgs():
+    helpTxt = 'You may optionally place each argument, line by line, in a file, then read\
+               arguments from that file as so: "python3 file.py @argumentFile.txt"'
      # check arguments
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(fromfile_prefix_chars='@', epilog=helpTxt)
     parser.add_argument("pool_name", help="the pool you want to connect to.")
     parser.add_argument("wallet_name", help="wallet name to be used")
     parser.add_argument("wallet_key", help="wallet key for opening the wallet")
