@@ -4,7 +4,8 @@ import logging
 import json
 import rocksdb
 from indy import did, ledger, pool, wallet
-from LedgerDownloader import LedgerDownloader
+from LocalLedger import LocalLedger
+from Transaction import Transaction
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -17,9 +18,9 @@ class LedgerReader():
     Requires a LedgerDownloader object.
     '''
 
-    def __init__(self, ledgerDownloader):
-        self.ld = ledgerDownloader
-        if self.ld == None:
+    def __init__(self, localLedger):
+        self.l = localLedger
+        if self.l == None:
             raise Exception('LedgerDownloader object must be provided') 
 
     def getTxn(self, seqNo=None, timestamp=None):
@@ -31,13 +32,13 @@ class LedgerReader():
             raise Exception('Cannot provide both sequence number and timestamp')
 
         if seqNo != None:
-            return self.ld.getTxn(seqNo)
+            return self.l.getTxn(seqNo)
         else:
             return self._getTxnByTimestamp(timestamp)
 
     def getTxnCount(self):
         '''Gets number of transactions stored in the database'''
-        return self.ld.getTxnCount()
+        return self.l.getTxnCount()
         
     def _getTxnByTimestamp(self, timestamp):
         '''
@@ -45,7 +46,7 @@ class LedgerReader():
         returns (txn, seqNo)
         known bug: can't return txn seqNo <27 due to txn <17 with no timestamp
         '''
-        txnCount = self.ld.getTxnCount()
+        txnCount = self.l.getTxnCount()
 
         if timestamp == None:
             return None

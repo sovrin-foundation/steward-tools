@@ -7,9 +7,7 @@ import rocksdb
 import os
 from indy import did, ledger, pool, wallet
 from pprint import pprint
-
-logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
+from Transaction import Transaction
 
 
 class TxnDoesNotExistException(Exception):
@@ -18,75 +16,10 @@ class TxnDoesNotExistException(Exception):
 class InvalidLedgerResponseException(Exception):
     pass
 
-class Transaction():
-
-    def __init__(self, data):
-        self.data = data
-
-        if 'data' in self.data:
-            self.print()
-            raise Exception('Wrong Transaction format')
-
-    def getType(self):
-        try:
-            return self.data['txn']['type']
-        except KeyError:
-            return None
-            
-    def getTime(self):
-        try:
-            return self.data['txnMetadata']['txnTime']
-        except KeyError:
-            return None
-
-    def getSeqNo(self):
-        try:
-            return self.data['txnMetadata']['seqNo']
-        except KeyError:
-            return None
-
-    def getSenderDid(self):
-        try:
-            return self.data['txn']['metadata']['from']
-        except KeyError:
-            return None
-
-    def print(self):
-        print(json.dumps(self.data, indent=4))
-
-    def printKeys(self):
-        self._printInnerKeys(self.data, 0) 
-
-    def _printInnerKeys(self, d, indentLevel):
-        for key, value in d.items():
-                print(('  ' * indentLevel) + '\'' + str(key) + '\'')
-                if isinstance(value, dict):
-                    self._printInnerKeys(value, indentLevel + 1)
- 
-
-    def __setitem__(self, key, item):
-        self.data[key] = item
-
-    def __getitem__(self, key):
-        return self.data[key]
-
-    def __repr__(self):
-        return repr(self.data)
-
-    def __str__(self):
-        return str(self.data)
-
-    def __len__(self):
-        return len(self.data)
-
-    def __delitem__(self, key):
-        del self.data[key]
-
-
 
 # TODO: add option to download specific set of transactions instead of all at once
 # TODO: download faster (why is there a delay after every 5 requests?)
-class LedgerDownloader():
+class LocalLedger():
     ''' 
     Uses a rocksdb key-value database to download and store an indy network ledger
     Automatically downloads all transactions as they are added on the net

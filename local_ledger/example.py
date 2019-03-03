@@ -23,7 +23,7 @@ async def main():
     parser.add_argument("signing_did", help="did used to sign requests sent to the ledger")
     args = parser.parse_args()
 
-    ld = LedgerDownloader("ledger_copy.db", args.pool_name, args.wallet_name, args.wallet_key, 
+    ld = LocalLedger("ledger_copy.db", args.pool_name, args.wallet_name, args.wallet_key, 
                           args.signing_did)
     await ld.connect()
     await ld.update()

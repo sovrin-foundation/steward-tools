@@ -17,8 +17,9 @@ from datetime import datetime
 import sys
 sys.path.insert(0, '../local_ledger/')
 
-from LedgerDownloader import LedgerDownloader, Transaction
+from LocalLedger import LocalLedger, Transaction
 from LedgerReader import LedgerReader
+from Transaction import Transaction
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -37,13 +38,13 @@ def parseArgs():
     return parser.parse_args()
 
 async def loadTxnsLocally(args, startTimestamp, endTimestamp):
-    ld = LedgerDownloader("ledger_copy.db", args.pool_name, args.wallet_name, args.wallet_key, 
+    l = LocalLedger("ledger_copy.db", args.pool_name, args.wallet_name, args.wallet_key, 
                           args.signing_did)
     # first updates the local ledger database
-    await ld.connect()
-    await ld.update()
-    await ld.disconnect()
-    lr = LedgerReader(ld)
+    await l.connect()
+    await l.update()
+    await l.disconnect()
+    lr = LedgerReader(l)
     return lr.getTxnRange(startTime=startTimestamp, endTime=endTimestamp)
 
 def printTotalFeesInPeriod(txns, txnsByType, fees, startTimestamp, endTimestamp):
@@ -114,7 +115,7 @@ async def main():
     # dict of how much each transaction type currently costs
     fees = {}
 
-    # hardcoded for now; get these from the ledger later
+    # hardcoded for now, these are only example prices; get fee amounts from the ledger later
     fees['1'] = 10
     fees['100'] = 10
     fees['101'] = 50
@@ -138,11 +139,6 @@ async def main():
     printTotalFeesInPeriod(txns, txnsByType, fees, startTimestamp, endTimestamp)
     outputBillsFile(startTimestamp, endTimestamp, bills)
 
-    # prints only keys in a category of txns 
-    #for t in txnsByType[schemaTxn]:
-    #    t.printKeys()
-    #    print('\n\n') 
-        
 
 if __name__ == '__main__':
     try:
