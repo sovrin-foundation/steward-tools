@@ -1,3 +1,5 @@
+
+# Helper class which stores transaction json and allows easy interaction with it
 class Transaction():
 
     def __init__(self, data):
@@ -19,6 +21,7 @@ class Transaction():
         except KeyError:
             return None
 
+    # Gets the sequence number of the transaction, which is also its key
     def getSeqNo(self):
         try:
             return self.data['txnMetadata']['seqNo']
@@ -31,9 +34,11 @@ class Transaction():
         except KeyError:
             return None
 
+    # pretty prints the full json of the transaction
     def print(self):
         print(json.dumps(self.data, indent=4))
 
+    # Prints all keys in all dicts, indenting to indicate inner dicts
     def printKeys(self):
         self._printInnerKeys(self.data, 0) 
 
@@ -44,6 +49,8 @@ class Transaction():
                     self._printInnerKeys(value, indentLevel + 1)
  
 
+    # These methods allow a transaction to be treated like a dict directly.
+    # Example: Get transaction t's seqNo like this: t['txnMetadata']['seqNo']
     def __setitem__(self, key, item):
         self.data[key] = item
 
