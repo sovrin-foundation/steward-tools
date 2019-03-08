@@ -102,8 +102,8 @@ class LocalLedger():
         while True:
             try:
                 await self.downloadTxn(self.pool_handle, self.did, 'DOMAIN', curTxn)
+            # if there is no transaction, we've reached the most recent one so break
             except TxnDoesNotExistException:
-                #print('\n')
                 break
 
             if not printedDownload:
@@ -130,10 +130,11 @@ class LocalLedger():
         except Exception:
             return 0
 
-    def getTxn(self, seqNo):
+    def getTxn(self, seqNo): 
         '''Retrieves a transaction with its sequence number in a tuple'''
         try:
-            return json.loads(self._db.get(self.intToBytes(seqNo)).decode('ascii')) 
+            return Transaction(json.loads(self._db.get(self.intToBytes(seqNo)).decode('ascii'))) 
+        # if the sequence number isn't a key in the database, return nothing
         except AttributeError:
             return None
 

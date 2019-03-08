@@ -1,3 +1,4 @@
+import json
 
 # Helper class which stores transaction json and allows easy interaction with it
 class Transaction():
@@ -6,7 +7,6 @@ class Transaction():
         self.data = data
 
         if 'data' in self.data:
-            self.print()
             raise Exception('Wrong Transaction format')
 
     def getType(self):
@@ -33,6 +33,11 @@ class Transaction():
             return self.data['txn']['metadata']['from']
         except KeyError:
             return None
+
+    def asKeyValue(self):
+        key = self.getSeqNo() 
+        value = self
+        return key, value
 
     # pretty prints the full json of the transaction
     def print(self):

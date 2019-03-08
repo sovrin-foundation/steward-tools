@@ -21,7 +21,7 @@ class LedgerReader():
     def __init__(self, localLedger):
         self.l = localLedger
         if self.l == None:
-            raise Exception('LedgerDownloader object must be provided') 
+            raise Exception('LocalLedger object must be provided') 
 
     def getTxn(self, seqNo=None, timestamp=None):
         '''Wrapper to get transaction by sequence number or timestamp''' 
@@ -59,14 +59,19 @@ class LedgerReader():
                 try:
                     txnTimestamp = curTxn['txnMetadata']['txnTime']
                 except KeyError as e:
-                    print('Txn', str(mid), 'txnTime in txnMetadata not found')
-                    print(json.dumps(curTxn, indent=4))
+                    print('Txn' +  str(mid) + ': txnTime in txnMetadata not found, ', end='')
                     # bug: sometimes 'txnMetadata' cannot be found, but later it can be.
-                    # in both cases, it appears in the print statment
-                    # first ~17 transactions have no timestamps; just return first txn
+                    # first ~17 transactions have no timestamps because they are genesis
+                    # txns. If the binary search encounters one of these first transactions,
+                    # it will fail and return the first transaction.
                     if mid < 17:
+                        print('Reason: This is a genesis transaction')
+                        print('Returning first genesis transaction')
                         return self.getTxn(1)
-                    raise e
+                    else: 
+                        print('Reason: Unknown')
+                        print(json.dumps(curTxn, indent=4))
+                        raise e
 
                 #print('\n\n\nSearching TXN:', json.dumps(curTxn, indent=4))
                 # If element is present at the middle itself
