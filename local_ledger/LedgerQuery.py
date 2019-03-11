@@ -70,7 +70,9 @@ def _getTxnByTimestamp(ledger, timestamp, contiguous=True):
             curTxn = getTxn(ledger, mid)
             try:
                 txnTimestamp = curTxn.getTime()
-            except KeyError as e:
+                if txnTimestamp == None:
+                    raise Exception('txntimestamp returned None')
+            except (KeyError, Exception) as e:
                 print('Txn ' +  str(mid) + ': txnTime in txnMetadata not found, ', end='')
                 # bug: sometimes 'txnMetadata' cannot be found, but later it can be.
                 # first ~17 transactions have no timestamps because they are genesis
@@ -85,7 +87,6 @@ def _getTxnByTimestamp(ledger, timestamp, contiguous=True):
                     print(json.dumps(curTxn, indent=4))
                     raise e
 
-            #print('\n\n\nSearching TXN:', json.dumps(curTxn, indent=4))
             # If element is present at the middle itself
             if ts == txnTimestamp:
                 return curTxn

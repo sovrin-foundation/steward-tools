@@ -117,6 +117,7 @@ async def main():
     fees = {}
 
     # hardcoded for now, these are only example prices; get fee amounts from the ledger later
+
     fees['1'] = 10
     fees['100'] = 10
     fees['101'] = 50
