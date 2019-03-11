@@ -1,4 +1,4 @@
-#! /usr/bin/python3
+#!/usr/bin/python3
 
 import argparse
 import os
@@ -72,7 +72,7 @@ def make_domain_genesis(domain_pathname, trustee_defs, steward_defs):
    
    seq_no = 1
    for trustee_def in trustee_defs:
-      txn = Member.nym_txn(trustee_def['nym'], verkey=trustee_def['verkey'], role=TRUSTEE,
+      txn = Member.nym_txn(trustee_def['nym'], name=trustee_def['name'], verkey=trustee_def['verkey'], role=TRUSTEE,
                            seq_no=seq_no,
                            protocol_version=None)
       domain_ledger.add(txn)
@@ -92,8 +92,8 @@ def make_domain_genesis(domain_pathname, trustee_defs, steward_defs):
 # --- MAIN ---
 
 parser = argparse.ArgumentParser(description = 'Uses .csv files as inputs for trustee and steward info, and produces genesis files.')
-parser.add_argument('--pool', help='[OUTPUT] pool transactions pathname.', default='./pool_transactions_genesis')
-parser.add_argument('--domain', help='[OUTPUT] domain transactions pathname.', default='./domain_transactions_genesis')
+parser.add_argument('--pool', help='[OUTPUT] pool transactions pathname.', default='./pool_transactions')
+parser.add_argument('--domain', help='[OUTPUT] domain transactions pathname.', default='./domain_transactions')
 required = parser.add_argument_group('required arguements')
 required.add_argument('--trustees', help="[INPUT] .csv with headers: 'Trustee name', 'Trustee DID', 'Trustee verkey'", required=True)
 required.add_argument('--stewards', help="[INPUT] .csv with headers: 'Steward DID', 'Steward verkey', 'Validator alias', 'Node IP address','Node port', 'Client IP address', 'Client port', 'Validator verkey', 'Validator BLS key', 'Validator BLS POP'", required=True)
