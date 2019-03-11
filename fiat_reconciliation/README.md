@@ -6,5 +6,10 @@ As the details for the fiat payment option are still under revision, this method
 
 ## Usage
 
+To run, you must have indy installed with a pool (ledger network) already configured, a wallet, and a did on that ledger.
+
 ``` python3 fiatReconciler.py [pool to connect to] [wallet] [wallet key] [did] [startTime] [endTime]```
 
+Example (used to generate the corresponding file in `examples/`:
+
+``` python3 fiatReconciler.py mainnet wallet_name wallet_password UFSFjGNiain5FQ2m88dijd 01/01/2019 01/20/2019```
