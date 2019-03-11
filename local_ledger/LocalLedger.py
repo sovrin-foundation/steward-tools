@@ -24,6 +24,10 @@ class LocalLedger():
     Uses a rocksdb key-value database to download and store an indy network ledger
     Automatically downloads all transactions as they are added on the net
     Allows for simple transaction reading by sequence number
+
+    NOTE: Currently this uses an indy GET_TXN request to get every transaction on the ledger.
+    This is slow and extremely chatty, and should eventually be replaced with a batch message
+    request or catchup solutions; however, these options still need to be implemented in indy-sdk.
     ''' 
 
     def __init__(self, filename, poolname, walletname, key, did):

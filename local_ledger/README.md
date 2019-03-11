@@ -4,13 +4,15 @@ This tool allows you to download a copy of a specified ledger to your local mach
 
 This tool is still being developed and should not be used in production for the time being. Downloading an entire ledger's worth of transaction may currently take several hours to complete.
 
+NOTE: Currently this uses an indy GET_TXN request to get every transaction on the ledger. This is slow and extremely chatty, and should eventually be replaced with a batch message request or catchup solutions; however, these options still need to be implemented in indy-sdk.
+
 ## LocalLedger Object
 
 The LocalLedger Python object can download any indy ledger when provided with a pool to connect to and a did on that ledger. It uses a Rocksdb key-value pair database to store the ledger in a local file. Individual transactions can be retrieved in json via their sequence number.
 
-## LedgerReader Object
+## LedgerQuery Object
 
-The LedgerReader allows more complex querying of a LocalLedger object. For example, a range of transactions by time and date can be queried.
+The LedgerQuery allows more complex querying of a LocalLedger object. For example, a range of transactions by time and date or sequence number can be queried. All transactions by a certain did may also be retrieved, and every function works with either a LocalLedger storage object or a dictionary of transactions.
 
 ## Example
 
