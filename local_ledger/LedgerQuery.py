@@ -131,7 +131,6 @@ def getTxnRange(ledger, startTime=None, endTime=None, startSeqNo=None, endSeqNo=
         # timestamp, decrement ending sequence number if it is after the ending time
         if 'txnTime' in txn['txnMetadata'] and txn['txnMetadata']['txnTime'] > endTime:
             endSeqNo -= 1
-    print(startSeqNo, endSeqNo)
     if startSeqNo < 1 or endSeqNo < startSeqNo:
         if (isinstance(ledger, LocalLedger) and endSeqNo > getTxnCount(ledger)) or \
             (isinstance(ledger, dict) and endSeqNo > max(ledger.keys())):
@@ -151,14 +150,12 @@ def getTxnRange(ledger, startTime=None, endTime=None, startSeqNo=None, endSeqNo=
 def getDidTxns(ledger, did):
     if isinstance(ledger, LocalLedger):
         txns = getTxnRange(ledger, startSeqNo = 1, endSeqNo = ledger.getTxnCount()) 
-        print(type(txns))
         txns = txns.values()
     elif isinstance(ledger, dict):
         txns = ledger.values() 
 
     didTxns = {} 
     for t in txns:
-       print(t.getSenderDid(), did)
        if t.getSenderDid() == did:
            didTxns[t.getSeqNo()] = t
     

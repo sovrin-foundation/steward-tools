@@ -7,3 +7,4 @@ As the details for the fiat payment option are still under revision, this method
 ## Usage
 
 ``` python3 fiatReconciler.py [pool to connect to] [wallet] [wallet key] [did] [startTime] [endTime]```
+

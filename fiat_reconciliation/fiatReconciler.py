@@ -18,7 +18,7 @@ import sys
 sys.path.insert(0, '../local_ledger/')
 
 from LocalLedger import LocalLedger, Transaction
-from LedgerReader import LedgerReader
+import LedgerQuery as lq
 from Transaction import Transaction
 
 logger = logging.getLogger(__name__)
@@ -27,7 +27,7 @@ logging.basicConfig(level=logging.INFO)
 def parseArgs():
     helpTxt = 'You may optionally place each argument, line by line, in a file, then read\
                arguments from that file as so: "python3 file.py @argumentFile.txt"'
-     # check arguments
+     # ch.eck arguments
     parser = argparse.ArgumentParser(fromfile_prefix_chars='@', epilog=helpTxt)
     parser.add_argument("pool_name", help="the pool you want to connect to.")
     parser.add_argument("wallet_name", help="wallet name to be used")
@@ -44,8 +44,7 @@ async def loadTxnsLocally(args, startTimestamp, endTimestamp):
     await l.connect()
     await l.update()
     await l.disconnect()
-    lr = LedgerReader(l)
-    return lr.getTxnRange(startTime=startTimestamp, endTime=endTimestamp)
+    return lq.getTxnRange(l, startTime=startTimestamp, endTime=endTimestamp)
 
 def printTotalFeesInPeriod(txns, txnsByType, fees, startTimestamp, endTimestamp):
     nymTxn = '1'
@@ -95,6 +94,8 @@ def outputBillsFile(startTimestamp, endTimestamp, bills):
     with open(filename, 'w') as f:
         for key, value in bills.items():
             f.write(str(key) + ',' + str(value) +  '\n')
+
+    print('Billing by did written to \'' + filename + '\'.')
         
 
 async def main():
@@ -121,23 +122,26 @@ async def main():
     fees['101'] = 50
     fees['102'] = 25
    
-    for t in txns:
-        txn = Transaction(t)
-
+   
+    for t in txns.values():
         # populate txnsByType dict
-        if txn.getType() not in txnsByType:
-            txnsByType[txn.getType()] = [txn]
+        if t.getType() not in txnsByType:
+            txnsByType[t.getType()] = [t]
         else:
-            txnsByType[txn.getType()].append(txn)
+            txnsByType[t.getType()].append(t)
 
         # populate bills dict
-        if txn.getSenderDid() not in bills:
-            bills[txn.getSenderDid()] = fees[txn.getType()]
+        if t.getSenderDid() not in bills:
+            bills[t.getSenderDid()] = fees[t.getType()]
         else:
-            bills[txn.getSenderDid()] += fees[txn.getType()]
+            bills[t.getSenderDid()] += fees[t.getType()]
 
     printTotalFeesInPeriod(txns, txnsByType, fees, startTimestamp, endTimestamp)
     outputBillsFile(startTimestamp, endTimestamp, bills)
+    
+    #for t in txnsByType['102']:
+    #    print('\n\n')
+    #    t.printKeys()
 
 
 if __name__ == '__main__':

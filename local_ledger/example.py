@@ -1,5 +1,8 @@
 # @author: Ryan West (ryan.west@sovrin.org)
 
+# This example script shows how LocalLedger and LedgerQuery can be used to get insights and 
+# queries from the ledger.
+
 # This script requires 4 parameters as follows:
 #     pool_name   -  The name of the pool you created to attach to the Sovrin Network (pool must already exist)
 #     wallet_name -  The name of the wallet containing the DID used to send ledger requests (wallet must already exist)
@@ -14,7 +17,6 @@ from LocalLedger import LocalLedger
 import LedgerQuery as lq
 
 async def main():
-
     # check arguments
     parser = argparse.ArgumentParser(fromfile_prefix_chars='@')
     parser.add_argument("pool_name", help="the pool you want to connect to.")
@@ -25,11 +27,13 @@ async def main():
 
     l = LocalLedger("ledger_copy.db", args.pool_name, args.wallet_name, args.wallet_key, 
                           args.signing_did)
+    # establishes a connection with the pool object
     await l.connect()
+    # updates the pool till the most recent txn is reached (may take awhile)
     await l.update()
     
     # test LedgerQuery functions using LocalLedger
-    print('Ledger count:', lq.getTxnCount(l))
+    print('\nLedger count:', lq.getTxnCount(l))
 
     lastTxn = lq.getTxn(l, lq.getTxnCount(l))
     print('Last sequence number:', lastTxn.getSeqNo())
@@ -45,27 +49,35 @@ async def main():
 
     janTxns = lq.getTxnRange(l, startTime=1546326000, endTime=1549004400)
     print('Number of txns in January 2019:', len(janTxns))
-    #print(janTxns.keys())
+
     # test methods called on a dict of txns instead of a LocalLedger
     janFirstTxnSeqNo = lq.getTxn(janTxns, timestamp=546326000).getSeqNo()
     janLastTxnSeqNo = lq.getTxn(janTxns, timestamp=2649004400).getSeqNo()
     print('First/Last txn in Jan 2019:', janFirstTxnSeqNo, '/', janLastTxnSeqNo)
 
+    failedFirsttxn = lq.getTxn(janTxns, seqNo=1)
+    print('Txn seq no 1 from Jan 2019 list (returns None since does not exist):', failedFirsttxn)
+
     # first timestamp purposely wrong but still returns correct value 
     jan1Txns = lq.getTxnRange(janTxns, startTime=1000, endTime=1546412400)
     print('Number of transactions in January 1st, 2019:', lq.getTxnCount(jan1Txns)) 
 
+    # gets txn range from January txns by sequence numbers
     janSeqRng = lq.getTxnRange(janTxns, startSeqNo=20200, endSeqNo=20201)
-    #print(janSeqRng)
 
-    didTxns = lq.getDidTxns(l, 'QAxGCiizb9VZNiwZEBJzon')
-    print(didTxns)
+    # retrieves all txns by a certain did
+    did = 'KvGE2tKSDuBXEkRc86dL4T'
+    didTxns = lq.getDidTxns(l, did)
+    print('number of txns by did \'' +  did + '\': ' + str(len(didTxns)))
+
+    # retrieves all txns by a certain did from a dict of txns
+    didTxns = lq.getDidTxns(janTxns, did)
+    print('number of txns by did from january txns\'' +  did + '\': ' + str(len(didTxns)))
 
     await l.disconnect()
 
 if __name__ == '__main__':
     try:
-        # TODO: move this into LedgerDownloader (with option to have external loop instead)
         loop = asyncio.get_event_loop()
         loop.run_until_complete(main())
     except KeyboardInterrupt:
