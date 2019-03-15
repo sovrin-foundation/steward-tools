@@ -17,6 +17,12 @@ import asyncio
 import argparse
 import time
 from datetime import datetime
+import urllib.request
+
+nymTxn = '1'
+attribTxn = '100'
+schemaTxn = '101'
+credDefTxn = '102'
 
 
 # Handles and parses all arguments, returning them
@@ -38,6 +44,16 @@ def parseArgs():
     return parser.parse_args()
 
 
+# Converts a POSIX timestamp into a mm/dd/yyyy date
+def getTimestampStr(date):
+    return str(datetime.utcfromtimestamp(date).strftime('%m-%d-%Y'))
+
+
+# Converts a mm/dd/yyyy string into a POSIX timestamp
+def getTimestamp(dateStr):
+    return time.mktime(datetime.strptime(dateStr, "%m/%d/%Y").timetuple())
+
+
 # Connects to the specified ledger and updates it until the latest txn
 # has been downloaded
 async def loadTxnsLocally(args, startTimestamp, endTimestamp):
@@ -53,11 +69,6 @@ async def loadTxnsLocally(args, startTimestamp, endTimestamp):
 # Gets all txns within the specified period (using startTimeStamp and
 # stopTimeStamp), then totals the fees for each txn type and prints them
 def printFeesInPeriod(txns, txnsByType, fees, startTimestamp, endTimestamp):
-    nymTxn = '1'
-    attribTxn = '100'
-    schemaTxn = '101'
-    credDefTxn = '102'
-
     try:
         totalNymCost = fees['1'] * len(txnsByType[nymTxn])
     except Exception:
@@ -108,10 +119,8 @@ def printFeesInPeriod(txns, txnsByType, fees, startTimestamp, endTimestamp):
 # from that period (based on type and number of txns written), and prints this
 # info to a csv file.
 def outputBillsFile(startTimestamp, endTimestamp, bills):
-    startTimeStr = str(datetime.utcfromtimestamp(
-        startTimestamp).strftime('%m-%d-%Y'))
-    endTimeStr = str(datetime.utcfromtimestamp(
-        endTimestamp).strftime('%m-%d-%Y'))
+    startTimeStr = getTimestampStr(startTimestamp)
+    endTimeStr = getTimestampStr(endTimestamp)
 
     filename = 'billing ' + startTimeStr + ' to ' + endTimeStr + '.csv'
     with open(filename, 'w') as f:
@@ -121,24 +130,97 @@ def outputBillsFile(startTimestamp, endTimestamp, bills):
     print('Billing by did written to \'' + filename + '\'.')
 
 
+# Looks at the Sovrin fiat fees spreadsheet (in csv format) and converts it
+# into a dict to use when calculating fees over time (where the fees may have
+# changed in the middle of a billing period)
+def getFiatFees(csvFile='fiatFees.csv'):
+
+    feesURL = 'https://docs.google.com/spreadsheets/d/1RFhQ4cOid7h_GoKZKNXudDSlFoyhbyq5U4gsqW4gthE/export?format=csv'  # noqa
+
+    # downloads the fees.csv file from Google Sheets
+    urllib.request.urlretrieve(feesURL, 'fiatFees.csv')
+    # opens the file just downloaded (unless another is chosen) to read from
+    with open(csvFile, 'r') as file:
+        lines = file.readlines()
+
+    if len(lines) == 0:
+        raise Exception('No fee information found')
+
+    # remove header column, if it exists
+    if lines[0].startswith('Date'):
+        lines.pop(0)
+
+    feesByTimePeriod = {}
+
+    for line in lines:
+        data = line.split(',')
+        if len(data) != 8:
+            raise Exception('Wrong format for fees csv file')
+
+        timestamp = getTimestamp(data[0])
+        nymFee = float(data[2])
+        attribFee = float(data[3])
+        schemaFee = float(data[4])
+        credDefFee = float(data[5])
+        # Revocation registry is disabled on mainnet for now; ignore these
+        # revocRegFee = float(data[6])
+        # revogRegUpdateFee = float(data[7])
+
+        feesByTimePeriod[timestamp] = {
+            nymTxn: nymFee,
+            attribTxn: attribFee,
+            schemaTxn: schemaFee,
+            credDefTxn: credDefFee
+            # more will be added when revocation is supported
+        }
+
+    return feesByTimePeriod
+
+
+# Calculates the bill amount for each did in the time period, checking for
+# fee updates based on the Sovrin fees spreadsheet on Google Sheets
+# TODO: add way to check if txn was token-based or fiat-based
+def calculateBills(feesByTimePeriod, txns):
+    # dict of all DIDs who owe money for the current period
+    # in the form key: did, val: amount
+    bills = {}
+
+    def _getFeeForTxn(txn, feesByTimePeriod):
+        lastTimestamp = 0
+        txnTimestamp = txn.getTime()
+        for timestamp, fees in sorted(feesByTimePeriod.items()):
+            if txnTimestamp < timestamp:
+                break
+            lastTimestamp = timestamp
+
+        if lastTimestamp == 0:
+            raise Exception('No fees found for transaction timestamp')
+
+        return feesByTimePeriod[lastTimestamp][txn.getType()]
+
+    for t in txns.values():
+        # populate bills dict
+        if t.getSenderDid() not in bills:
+            bills[t.getSenderDid()] = _getFeeForTxn(t, feesByTimePeriod)
+        else:
+            bills[t.getSenderDid()] += _getFeeForTxn(t, feesByTimePeriod)
+
+    return bills
+
+
 async def main():
 
     args = parseArgs()
 
     # convert input args to timestamps
-    startTimestamp = time.mktime(datetime.strptime(
-        args.start_date, "%m/%d/%Y").timetuple())
-    endTimestamp = time.mktime(datetime.strptime(
-        args.end_date, "%m/%d/%Y").timetuple())
+    startTimestamp = getTimestamp(args.start_date)
+    endTimestamp = getTimestamp(args.end_date)
 
     # all transactions in the specified range
     txns = await loadTxnsLocally(args, startTimestamp, endTimestamp)
 
     # transactions separated by type in the format key: type, val: list(txns)
     txnsByType = {}
-    # dict of all DIDs who owe money for the current period
-    # in the form key: did, val: amount
-    bills = {}
     # dict of how much each transaction type currently costs
     fees = {}
 
@@ -155,15 +237,12 @@ async def main():
         else:
             txnsByType[t.getType()].append(t)
 
-        # populate bills dict
-        if t.getSenderDid() not in bills:
-            bills[t.getSenderDid()] = fees[t.getType()]
-        else:
-            bills[t.getSenderDid()] += fees[t.getType()]
-
     printFeesInPeriod(txns, txnsByType, fees,
                       startTimestamp, endTimestamp)
 
+    # retrive fiat fees
+    feesByTimePeriod = getFiatFees()
+    bills = calculateBills(feesByTimePeriod, txns)
     outputBillsFile(startTimestamp, endTimestamp, bills)
 
     # Prints all schema keys
