@@ -8,7 +8,7 @@ As the details for the fiat payment option are still under revision, this method
 
 ## Usage
 
-To run, you must have the following dependencies installed:
+You must have the following dependencies installed:
 - [indy-sdk](https://github.com/hyperledger/indy-sdk) 
 - [rocksdb](https://github.com/facebook/rocksdb/blob/master/INSTALL.md)
 - python3
@@ -16,6 +16,8 @@ To run, you must have the following dependencies installed:
 
 
 You must also have a pool (ledger network) already configured, a wallet, and a did on that ledger. This can be done using the indy-cli (part of indy-sdk).
+
+Run with this command:
 
 ``` python3 fiatReconciler.py [pool to connect to] [wallet] [wallet key] [did] [startTime] [endTime]```
 
