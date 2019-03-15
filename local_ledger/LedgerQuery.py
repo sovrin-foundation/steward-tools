@@ -1,11 +1,6 @@
 # @Author: Ryan West (ryan.west@sovrin.org)
 import json
-import logging
-import json
-import rocksdb
-from indy import did, ledger, pool, wallet
 from LocalLedger import LocalLedger
-from Transaction import Transaction
 
 
 '''
@@ -121,8 +116,6 @@ def _getTxnByTimestamp(ledger, timestamp, contiguous=True):
     seqNo = txn.getSeqNo()
     return seqNo, txn
 
-# get all transactions within a certain range
-
 
 def getTxnRange(ledger, startTime=None, endTime=None,
                 startSeqNo=None, endSeqNo=None):
@@ -143,8 +136,8 @@ def getTxnRange(ledger, startTime=None, endTime=None,
             endSeqNo -= 1
     if startSeqNo < 1 or endSeqNo < startSeqNo:
         if ((isinstance(ledger, LocalLedger) and
-            endSeqNo > getTxnCount(ledger)) or isinstance(ledger, dict and
-            endSeqNo > max(ledger.keys()))):
+                endSeqNo > getTxnCount(ledger)) or isinstance(ledger, dict and
+                endSeqNo > max(ledger.keys()))):  # nopep8
             raise Exception("invalid start/end times")
     if startSeqNo is None or endSeqNo is None:
         raise Exception('Must specify a start and end')
@@ -160,6 +153,10 @@ def getTxnRange(ledger, startTime=None, endTime=None,
 
 
 def getDidTxns(ledger, did):
+    '''
+    Returns all transactions from the ledger object that are owned by the
+    specified did. The ledger can be a LocalLedger or a dict of transactions.
+    '''
     if isinstance(ledger, LocalLedger):
         txns = getTxnRange(ledger, startSeqNo=1, endSeqNo=ledger.getTxnCount())
         txns = txns.values()
