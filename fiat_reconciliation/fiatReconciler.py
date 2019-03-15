@@ -10,20 +10,16 @@
 #       get-validator-info (must already be in the wallet <wallet_name>)
 
 import sys
-sys.path.insert(0, '../local_ledger/')  # nopep8
+sys.path.insert(0, '../local_ledger/')  # nopep8  # noqa
 import LedgerQuery as lq
 from LocalLedger import LocalLedger
 import asyncio
-import logging
 import argparse
 import time
 from datetime import datetime
 
 
-logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
-
-
+# Handles and parses all arguments, returning them
 def parseArgs():
     helpTxt = 'You may optionally place each argument, line by line, in a\
         file, then read arguments from that file as so: \
@@ -42,6 +38,8 @@ def parseArgs():
     return parser.parse_args()
 
 
+# Connects to the specified ledger and updates it until the latest txn
+# has been downloaded
 async def loadTxnsLocally(args, startTimestamp, endTimestamp):
     ll = LocalLedger("ledger_copy.db", args.pool_name, args.wallet_name,
                      args.wallet_key, args.signing_did)
@@ -52,6 +50,8 @@ async def loadTxnsLocally(args, startTimestamp, endTimestamp):
     return lq.getTxnRange(ll, startTime=startTimestamp, endTime=endTimestamp)
 
 
+# Gets all txns within the specified period (using startTimeStamp and
+# stopTimeStamp), then totals the fees for each txn type and prints them
 def printFeesInPeriod(txns, txnsByType, fees, startTimestamp, endTimestamp):
     nymTxn = '1'
     attribTxn = '100'
@@ -103,6 +103,10 @@ def printFeesInPeriod(txns, txnsByType, fees, startTimestamp, endTimestamp):
             '\tTotal fees to be collected:', str(totalCDCost))
 
 
+# Gets all the txns in the time period starting with startTimestamp and
+# ending with endTimestamp, calculates how much every DID owner owes
+# from that period (based on type and number of txns written), and prints this
+# info to a csv file.
 def outputBillsFile(startTimestamp, endTimestamp, bills):
     startTimeStr = str(datetime.utcfromtimestamp(
         startTimestamp).strftime('%m-%d-%Y'))
@@ -121,6 +125,7 @@ async def main():
 
     args = parseArgs()
 
+    # convert input args to timestamps
     startTimestamp = time.mktime(datetime.strptime(
         args.start_date, "%m/%d/%Y").timetuple())
     endTimestamp = time.mktime(datetime.strptime(
@@ -158,8 +163,10 @@ async def main():
 
     printFeesInPeriod(txns, txnsByType, fees,
                       startTimestamp, endTimestamp)
+
     outputBillsFile(startTimestamp, endTimestamp, bills)
 
+    # Prints all schema keys
     # for t in txnsByType['102']:
     #    print('\n\n')
     #    t.printKeys()

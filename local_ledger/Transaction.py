@@ -11,41 +11,46 @@ class Transaction():
             raise Exception('Wrong Transaction format')
 
     def getType(self):
+        '''Returns the transaction type (NYM, CRED_DEF, etc)'''
         try:
             return self.data['txn']['type']
         except KeyError:
             return None
 
     def getTime(self):
+        '''Returns the timestamp for which the transaction was created'''
         try:
             return self.data['txnMetadata']['txnTime']
         except KeyError:
             return None
 
-    # Gets the sequence number of the transaction, which is also its key
     def getSeqNo(self):
+        '''Gets the sequence number of the txn, which is also its key'''
         try:
             return self.data['txnMetadata']['seqNo']
         except KeyError:
             return None
 
     def getSenderDid(self):
+        '''Gets the did of the transaction author'''
         try:
             return self.data['txn']['metadata']['from']
         except KeyError:
             return None
 
     def asKeyValue(self):
+        '''Returns the transaction in a tuple as (seqNo, txn), as it is stored
+           in a rocksdb database'''
         key = self.getSeqNo()
         value = self
         return key, value
 
-    # pretty prints the full json of the transaction
     def print(self):
+        '''Pretty prints the full json of the transaction'''
         print(json.dumps(self.data, indent=4))
 
-    # Prints all keys in all dicts, indenting to indicate inner dicts
     def printKeys(self):
+        '''Prints all keys in all dicts, indenting to indicate inner dicts'''
         self._printInnerKeys(self.data, 0)
 
     def _printInnerKeys(self, d, indentLevel):
@@ -54,8 +59,11 @@ class Transaction():
             if isinstance(value, dict):
                 self._printInnerKeys(value, indentLevel + 1)
 
-    # These methods allow a transaction to be treated like a dict directly.
-    # Example: Get transaction t's seqNo like this: t['txnMetadata']['seqNo']
+    '''
+    The methods  below allow a transaction to be treated like a dict
+    directly. For example: Get transaction t's seqNo like this:
+        t['txnMetadata']['seqNo']
+    '''
 
     def __setitem__(self, key, item):
         self.data[key] = item

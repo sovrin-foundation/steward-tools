@@ -15,7 +15,6 @@ class InvalidLedgerResponseException(Exception):
 
 
 # TODO: add option to download specific set of txns instead of all
-# TODO: download faster (why is there a delay after every 5 requests?)
 class LocalLedger():
     '''
     Uses a rocksdb key-value db to download and store an indy network ledger
@@ -48,6 +47,7 @@ class LocalLedger():
     async def connect(self):
         '''Connects to the pool specified in the constructor, using given
         wallet and did'''
+
         await pool.set_protocol_version(2)
 
         config = {}
@@ -61,12 +61,14 @@ class LocalLedger():
 
     async def disconnect(self):
         '''Closes indy wallet and pool connections'''
+
         await wallet.close_wallet(self.wallet_handle)
         await pool.close_pool_ledger(self.pool_handle)
 
     async def downloadTxn(self, pool_handle, submitter_did, which_ledger,
                           seq_no):
         '''Attempts to download the transaction with given sequence number'''
+
         # build get_txn request
         getTxnJson = await ledger.build_get_txn_request(submitter_did,
                                                         which_ledger, seq_no)
@@ -87,7 +89,7 @@ class LocalLedger():
             print('\n', json.dumps(json.loads(response), indent=4))
             raise InvalidLedgerResponseException()
 
-        self._db.put(self.intToBytes(key), json.dumps(value).encode())
+        self._db.put(self._intToBytes(key), json.dumps(value).encode())
 
     async def update(self):
         ''' Downlads new transactions to update local db with remote'''
@@ -116,16 +118,18 @@ class LocalLedger():
 
         print('Local ledger copy is up to date.')
 
-    def intToBytes(self, x):
+    def _intToBytes(self, x):
         return x.to_bytes((x.bit_length() + 7) // 8, 'big')
 
     def updateTxnCount(self, count):
         '''Updates the transaction count (stored as a key-value pair in db)'''
+
         self._db.put(b'lastTxnDownloaded', int.to_bytes(
             count, 10, byteorder='big'))
 
     def getTxnCount(self):
         '''Gets the number of transactions'''
+
         try:
             return int.from_bytes(self._db.get(b'lastTxnDownloaded'),
                                   byteorder='big')
@@ -134,8 +138,9 @@ class LocalLedger():
 
     def getTxn(self, seqNo):
         '''Retrieves a transaction with its sequence number in a tuple'''
+
         try:
-            return Transaction(json.loads(self._db.get(self.intToBytes(seqNo))
+            return Transaction(json.loads(self._db.get(self._intToBytes(seqNo))
                                .decode('ascii')))
         # if the sequence number isn't a key in the database, return nothing
         except AttributeError:

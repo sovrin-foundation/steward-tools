@@ -6,12 +6,16 @@ from LocalLedger import LocalLedger
 '''
 Provides more advanced queries to downloaded ledger data, including by time
 and by range in time or sequence number.
+
+These are classless functions and are called as so: LocalLedger.func()
+
 Requires a LedgerDownloader object.
 '''
 
 
 def getTxn(ledger, seqNo=None, timestamp=None):
-    '''Wrapper to get transaction by sequence number or timestamp'''
+    '''Wrapper to get transaction by sequence number or timestamp. This can
+       retrieve info from a LocalLedger or dict object.'''
 
     if ledger is None:
         raise Exception('LocalLedger object must be provided')
@@ -21,6 +25,7 @@ def getTxn(ledger, seqNo=None, timestamp=None):
     if seqNo is not None and timestamp is not None:
         raise Exception('Cannot provide both sequence number and timestamp')
 
+    # Handler if this is a dict
     if isinstance(ledger, dict):
         if seqNo is not None:
             if seqNo in ledger:
@@ -28,6 +33,7 @@ def getTxn(ledger, seqNo=None, timestamp=None):
         else:
             _, txn = _getTxnByTimestamp(ledger, timestamp)
             return txn
+    # Handler if this is a LocalLedger
     elif isinstance(ledger, LocalLedger):
         if seqNo is not None:
             return ledger.getTxn(seqNo)
@@ -61,6 +67,9 @@ def _getTxnByTimestamp(ledger, timestamp, contiguous=True):
     if timestamp is None:
         return None
 
+    # Binary search is used when searching for a txn in the LocalLedger,
+    # since txns in a LocalLedger are sequential and start from 1.
+    # This makes search time O(logn)
     def binarySearch(l, r, ts):
         # Check base case
         if r >= l:
@@ -137,7 +146,7 @@ def getTxnRange(ledger, startTime=None, endTime=None,
     if startSeqNo < 1 or endSeqNo < startSeqNo:
         if ((isinstance(ledger, LocalLedger) and
                 endSeqNo > getTxnCount(ledger)) or isinstance(ledger, dict and
-                endSeqNo > max(ledger.keys()))):  # nopep8
+                endSeqNo > max(ledger.keys()))):  # nopep8  # noqa: E128
             raise Exception("invalid start/end times")
     if startSeqNo is None or endSeqNo is None:
         raise Exception('Must specify a start and end')
