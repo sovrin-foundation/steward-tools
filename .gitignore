@@ -102,3 +102,6 @@ ENV/
 
 # local ledger database
 */ledger_copy.db
+
+# local env data
+.idea/
