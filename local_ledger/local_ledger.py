@@ -96,8 +96,12 @@ class LocalLedger():
 
         self._db.put(self._intToBytes(key), json.dumps(value).encode())
 
-    async def update(self):
-        ''' Downlads new transactions to update local db with remote'''
+    async def update(self, limit=None):
+        ''' Downloads new transactions to sync local db with the remote.
+            limit: highest txn sequence number to get before stopping'''
+
+        if limit < 1:
+            raise Exception('Limit must be at least 1')
 
         # gets the last sequence number stored locally and updates from there
         curTxn = self.getTxnCount() + 1
@@ -105,7 +109,7 @@ class LocalLedger():
             curTxn = 1
         print('Last transaction sequence number:', str(curTxn - 1))
         printedDownload = False
-        while True:
+        while limit is None or limit >= curTxn:
             try:
                 await self.downloadTxn(self.pool_handle, self.did,
                                        'DOMAIN', curTxn)
@@ -121,7 +125,10 @@ class LocalLedger():
             # Keep track of the most recent transaction sequence number
             curTxn += 1
 
-        print('Local ledger copy is up to date.')
+        if limit is None:
+            print('Local ledger is up to date.')
+        else:
+            print('Local ledger has reached limit of', str(limit), 'txns.')
 
     def _intToBytes(self, x):
         return x.to_bytes((x.bit_length() + 7) // 8, 'big')

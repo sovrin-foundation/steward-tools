@@ -65,7 +65,6 @@ def _getTxnByTimestamp(ledger, timestamp, contiguous=True):
         search time.
     known bug: can't return txn seqNo <27 due to txn <17 with no timestamp
     '''
-
     if timestamp is None:
         return None
 
@@ -74,6 +73,7 @@ def _getTxnByTimestamp(ledger, timestamp, contiguous=True):
     # This makes search time O(logn)
     def binarySearch(l, r, ts):
         # Check base case
+        print(l, r, ts)
         if r >= l:
             mid = l + (r - l) // 2
             curTxn = getTxn(ledger, mid)
@@ -87,6 +87,8 @@ def _getTxnByTimestamp(ledger, timestamp, contiguous=True):
                 # first ~17 txns have no timestamps because they are genesis
                 # txns. If the binary search encounters one of these txns,
                 # it will fail and return the first transaction.
+                # TODO: improve this and make it not just guess that first
+                # ~17 of any ledger are genesis since this varies
                 if mid < 17:
                     print('Reason: This is a genesis transaction')
                     print('Returning first genesis transaction')
@@ -110,6 +112,7 @@ def _getTxnByTimestamp(ledger, timestamp, contiguous=True):
                 return binarySearch(mid + 1, r, ts)
         # if exact timestamp not found, return next in time
         else:
+            print('this:', l)
             return getTxn(ledger, l)
 
     # if using LocalLedger, then all txns from the first are stored
@@ -123,9 +126,20 @@ def _getTxnByTimestamp(ledger, timestamp, contiguous=True):
             highest = max(ledger.keys()) - 1
         else:
             raise Exception('noncontiguous not yet implemented')
-    txn = binarySearch(lowest, highest, timestamp)
-    seqNo = txn.getSeqNo()
-    return seqNo, txn
+
+    # this occurs if there are 0 transactions in the storage
+    if highest < lowest:
+        return None, None
+    # TODO: make sure this handles lowest == highest case
+    else:
+        txn = binarySearch(lowest, highest, timestamp)
+
+    if txn is not None:
+        seqNo = txn.getSeqNo()
+        return seqNo, txn
+    else:
+        # Should be unreachable code
+        return None, None
 
 
 def getTxnRange(ledger, startTime=None, endTime=None,
@@ -137,8 +151,13 @@ def getTxnRange(ledger, startTime=None, endTime=None,
     '''
     if startSeqNo is None:
         startSeqNo, _ = _getTxnByTimestamp(ledger, startTime)
+        # Returns none if ledger had 0 txns
+        if startSeqNo is None:
+            return None
     if endSeqNo is None:
         endSeqNo, txn = _getTxnByTimestamp(ledger, endTime)
+        if endSeqNo is None:
+            return None
         # since getTxnByTimestamp returns the NEXT transaction at or after the
         # given timestamp, decrement ending sequence number if it is after the
         # ending time
