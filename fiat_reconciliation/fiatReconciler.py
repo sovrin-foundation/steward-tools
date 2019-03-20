@@ -11,8 +11,8 @@
 
 import sys
 sys.path.insert(0, '../local_ledger/')  # nopep8  # noqa
-import LedgerQuery as lq
-from LocalLedger import LocalLedger
+import ledger_query as lq
+from local_ledger import LocalLedger
 import asyncio
 import argparse
 import time

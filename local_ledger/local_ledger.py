@@ -3,7 +3,7 @@ import json
 import rocksdb
 import os
 from indy import ledger, pool, wallet
-from Transaction import Transaction
+from transaction import Transaction
 
 
 class TxnDoesNotExistException(Exception):

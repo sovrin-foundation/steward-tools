@@ -11,8 +11,8 @@
 
 import asyncio
 import argparse
-from LocalLedger import LocalLedger
-import LedgerQuery as lq
+from local_ledger import LocalLedger
+import ledger_query as lq
 
 
 async def main():

@@ -1,6 +1,6 @@
 # @Author: Ryan West (ryan.west@sovrin.org)
 import json
-from LocalLedger import LocalLedger
+from local_ledger import LocalLedger
 
 
 '''
