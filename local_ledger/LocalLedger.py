@@ -75,7 +75,12 @@ class LocalLedger():
         # get response from ledger
         response = await ledger.submit_request(pool_handle, getTxnJson)
         # serialize json into object
-        responseJson = json.loads(response)['result']
+        try:
+            responseJson = json.loads(response)['result']
+        except KeyError as e:
+            print('result attribute not found in response. Response:')
+            print(response)
+            raise e
 
         # if we're at the last txn on the ledger, stop trying to download more
         if responseJson['data'] is None:

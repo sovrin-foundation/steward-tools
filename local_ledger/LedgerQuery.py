@@ -53,6 +53,8 @@ def getTxnCount(ledger):
         return len(ledger)
 
 
+# Possible improvement in complexity: use timestamp storage state root hash:
+# https://github.com/hyperledger/indy-plenum/blob/master/docs/source/storage.md#6-timestamp-storage  # noqa
 def _getTxnByTimestamp(ledger, timestamp, contiguous=True):
     '''
     finds closest transaction that occurred after given POSIX timestamp
