@@ -73,7 +73,6 @@ def _getTxnByTimestamp(ledger, timestamp, contiguous=True):
     # This makes search time O(logn)
     def binarySearch(l, r, ts):
         # Check base case
-        print(l, r, ts)
         if r >= l:
             mid = l + (r - l) // 2
             curTxn = getTxn(ledger, mid)
@@ -112,7 +111,6 @@ def _getTxnByTimestamp(ledger, timestamp, contiguous=True):
                 return binarySearch(mid + 1, r, ts)
         # if exact timestamp not found, return next in time
         else:
-            print('this:', l)
             return getTxn(ledger, l)
 
     # if using LocalLedger, then all txns from the first are stored

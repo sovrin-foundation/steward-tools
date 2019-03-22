@@ -24,6 +24,8 @@ To run:
 
 To use, you must have a pool, wallet, and did set up for the ledger you are trying to connect to. Additional instructions to run are found in example.py.
 
+*Note:* This does not work on macOS, as one of indy's dependencies, ZeroMQ, has a bug. ZeroMQ will eventually be replaced, which will resolve this.
+
 Rocksdb is used to store the ledger locally, just as it is stored on a node.
 
 This is, in a way, a preliminary version of an unprivileged observer node. It could eventually be added to indy-node.

@@ -24,3 +24,5 @@ Run with this command:
 Example (used to generate the corresponding file in `examples/`:
 
 ``` python3 fiatReconciler.py mainnet wallet_name wallet_password UFSFjGNiain5FQ2m88dijd 01/01/2019 02/01/2019```
+
+*Note:* This does not work on macOS, as one of indy's dependencies, ZeroMQ, has a bug. ZeroMQ will eventually be replaced, which will resolve this.
