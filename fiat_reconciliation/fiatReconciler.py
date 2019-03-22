@@ -124,7 +124,7 @@ def outputBillsFile(startTimestamp, endTimestamp, bills):
 
     filename = 'billing ' + startTimeStr + ' to ' + endTimeStr + '.csv'
     with open(filename, 'w') as f:
-        for key, value in bills.items():
+        for key, value in sorted(bills.items()):
             f.write(str(key) + ',' + str(value) + '\n')
 
     print('Billing by did written to \'' + filename + '\'.')
@@ -188,6 +188,10 @@ def calculateBills(feesByTimePeriod, txns):
     def _getFeeForTxn(txn, feesByTimePeriod):
         lastTimestamp = 0
         txnTimestamp = txn.getTime()
+        # if there is no timestamp, then it is most likely a genesis txn so
+        # do not charge anything
+        if txnTimestamp is None:
+            return 0
         for timestamp, fees in sorted(feesByTimePeriod.items()):
             if txnTimestamp < timestamp:
                 break
@@ -204,7 +208,13 @@ def calculateBills(feesByTimePeriod, txns):
             bills[t.getSenderDid()] = _getFeeForTxn(t, feesByTimePeriod)
         else:
             bills[t.getSenderDid()] += _getFeeForTxn(t, feesByTimePeriod)
+    
+    # If authorless genesis txns are in the range, we don't include these
+    bills.pop(None)
 
+    for b in bills:
+        if b == 0:
+            print(b)
     return bills
 
 
@@ -245,6 +255,8 @@ async def main():
     bills = calculateBills(feesByTimePeriod, txns)
     outputBillsFile(startTimestamp, endTimestamp, bills)
 
+
+        
     # Prints all schema keys
     # for t in txnsByType['102']:
     #    print('\n\n')
