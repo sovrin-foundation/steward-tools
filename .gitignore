@@ -101,4 +101,7 @@ ENV/
 .mypy_cache/
 
 # local ledger database
-local_ledger/*.db
+*/ledger_copy.db
+
+# local env data
+.idea/
