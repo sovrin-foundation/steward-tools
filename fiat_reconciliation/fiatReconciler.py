@@ -208,7 +208,7 @@ def calculateBills(feesByTimePeriod, txns):
             bills[t.getSenderDid()] = _getFeeForTxn(t, feesByTimePeriod)
         else:
             bills[t.getSenderDid()] += _getFeeForTxn(t, feesByTimePeriod)
-    
+
     # If authorless genesis txns are in the range, we don't include these
     bills.pop(None)
 
@@ -255,8 +255,6 @@ async def main():
     bills = calculateBills(feesByTimePeriod, txns)
     outputBillsFile(startTimestamp, endTimestamp, bills)
 
-
-        
     # Prints all schema keys
     # for t in txnsByType['102']:
     #    print('\n\n')
