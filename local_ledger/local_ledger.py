@@ -100,7 +100,7 @@ class LocalLedger():
         ''' Downloads new transactions to sync local db with the remote.
             limit: highest txn sequence number to get before stopping'''
 
-        if limit < 1:
+        if limit is not None and limit < 1:
             raise Exception('Limit must be at least 1')
 
         # gets the last sequence number stored locally and updates from there
