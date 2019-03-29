@@ -63,9 +63,11 @@ async def loadTxnsLocally(args, startTimestamp, endTimestamp):
     await ll.connect()
     await ll.update()
     await ll.disconnect()
+
     return lq.getTxnRange(ll, startTime=startTimestamp, endTime=endTimestamp)
 
 
+# TODO: fix so this works when using fees that update over time
 # Gets all txns within the specified period (using startTimeStamp and
 # stopTimeStamp), then totals the fees for each txn type and prints them
 def printFeesInPeriod(txns, txnsByType, fees, startTimestamp, endTimestamp):
@@ -208,7 +210,7 @@ def calculateBills(feesByTimePeriod, txns):
             bills[t.getSenderDid()] = _getFeeForTxn(t, feesByTimePeriod)
         else:
             bills[t.getSenderDid()] += _getFeeForTxn(t, feesByTimePeriod)
-
+ 
     # If authorless genesis txns are in the range, we don't include these
     bills.pop(None)
 
@@ -231,14 +233,6 @@ async def main():
 
     # transactions separated by type in the format key: type, val: list(txns)
     txnsByType = {}
-    # dict of how much each transaction type currently costs
-    fees = {}
-
-    # TODO: retrieve ledger fees from json/yaml implementation
-    fees['1'] = 10
-    fees['100'] = 10
-    fees['101'] = 50
-    fees['102'] = 25
 
     for t in txns.values():
         # populate txnsByType dict
@@ -247,14 +241,13 @@ async def main():
         else:
             txnsByType[t.getType()].append(t)
 
-    printFeesInPeriod(txns, txnsByType, fees,
-                      startTimestamp, endTimestamp)
-
     # retrive fiat fees
     feesByTimePeriod = getFiatFees()
+    # printFeesInPeriod(txns, txnsByType, feesByTimePeriod,
+    #                  startTimestamp, endTimestamp)
     bills = calculateBills(feesByTimePeriod, txns)
     outputBillsFile(startTimestamp, endTimestamp, bills)
-
+ 
     # Prints all schema keys
     # for t in txnsByType['102']:
     #    print('\n\n')
