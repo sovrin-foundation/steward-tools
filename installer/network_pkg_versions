@@ -5,6 +5,9 @@ buildernet:
   libnullpay: "1.8.1"
   libvcx: "0.2.34516997-f3254f8"
   indy-cli: "1.8.1"
+  libsovtoken: "0.9.6"
+  sovtoken: "0.9.9"
+  sovtokenfees: "0.9.9"
 
 stagingnet:
   indy-node: "1.6.83"
@@ -13,6 +16,9 @@ stagingnet:
   libnullpay: "1.8.1"
   libvcx: "0.2.34516997-f3254f8"
   indy-cli: "1.8.1"
+  libsovtoken: "0.9.6"
+  sovtoken: "0.9.9"
+  sovtokenfees: "0.9.9"
 
 mainnet:
   indy-node: "1.6.83"
@@ -21,3 +27,6 @@ mainnet:
   libnullpay: "1.8.1"
   libvcx: "0.2.34516997-f3254f8"
   indy-cli: "1.8.1"
+  libsovtoken: "None"
+  sovtoken: "None"
+  sovtokenfees: "None"
