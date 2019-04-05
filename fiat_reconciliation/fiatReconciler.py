@@ -42,7 +42,7 @@ def parseArgs():
     parser.add_argument(
         "end_date", help="mm/dd/yyyy time to stop looking at txns, inclusive")
     parser.add_argument(
-        "database_dir", help="optional field to indicate which database dir", 
+        "database_dir", help="optional field to indicate which database dir",
         default="ledger_copy.db", nargs='?')
     return parser.parse_args()
 
@@ -214,7 +214,7 @@ def calculateBills(feesByTimePeriod, txns):
             bills[t.getSenderDid()] = _getFeeForTxn(t, feesByTimePeriod)
         else:
             bills[t.getSenderDid()] += _getFeeForTxn(t, feesByTimePeriod)
- 
+
     # If authorless genesis txns are in the range, we don't include these
     bills.pop(None, None)
 
@@ -231,7 +231,7 @@ async def main():
     # convert input args to timestamps
     startTimestamp = getTimestamp(args.start_date)
     endTimestamp = getTimestamp(args.end_date)
-    
+
     # all transactions in the specified range
     txns = await loadTxnsLocally(args, startTimestamp, endTimestamp)
 
@@ -251,7 +251,7 @@ async def main():
     #                  startTimestamp, endTimestamp)
     bills = calculateBills(feesByTimePeriod, txns)
     outputBillsFile(startTimestamp, endTimestamp, bills)
- 
+
     return sorted(bills.items())
     # Prints all schema keys
     # for t in txnsByType['102']:
