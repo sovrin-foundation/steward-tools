@@ -41,6 +41,9 @@ def parseArgs():
         "start_date", help="mm/dd/yyyy time to start looking at txns")
     parser.add_argument(
         "end_date", help="mm/dd/yyyy time to stop looking at txns, inclusive")
+    parser.add_argument(
+        "database_dir", help="optional field to indicate which database dir", 
+        default="ledger_copy.db", nargs='?')
     return parser.parse_args()
 
 
@@ -57,7 +60,8 @@ def getTimestamp(dateStr):
 # Connects to the specified ledger and updates it until the latest txn
 # has been downloaded
 async def loadTxnsLocally(args, startTimestamp, endTimestamp):
-    ll = LocalLedger("ledger_copy.db", args.pool_name, args.wallet_name,
+    print(args.database_dir)
+    ll = LocalLedger(args.database_dir, args.pool_name, args.wallet_name,
                      args.wallet_key, args.signing_did)
     # first updates the local ledger database
     await ll.connect()
@@ -212,7 +216,7 @@ def calculateBills(feesByTimePeriod, txns):
             bills[t.getSenderDid()] += _getFeeForTxn(t, feesByTimePeriod)
  
     # If authorless genesis txns are in the range, we don't include these
-    bills.pop(None)
+    bills.pop(None, None)
 
     for b in bills:
         if b == 0:
@@ -227,7 +231,7 @@ async def main():
     # convert input args to timestamps
     startTimestamp = getTimestamp(args.start_date)
     endTimestamp = getTimestamp(args.end_date)
-
+    
     # all transactions in the specified range
     txns = await loadTxnsLocally(args, startTimestamp, endTimestamp)
 
@@ -248,6 +252,7 @@ async def main():
     bills = calculateBills(feesByTimePeriod, txns)
     outputBillsFile(startTimestamp, endTimestamp, bills)
  
+    return sorted(bills.items())
     # Prints all schema keys
     # for t in txnsByType['102']:
     #    print('\n\n')

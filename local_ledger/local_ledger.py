@@ -27,14 +27,12 @@ class LocalLedger():
     need to be implemented in indy-sdk.
     '''
 
-    def __init__(self, filename, poolname, walletname, key, did):
+    def __init__(self, databaseDir, poolname, walletname, key, did):
         '''Setup for inital use'''
-        self.filename = filename
         self.poolname = poolname
         self.walletname = walletname
         self.key = key
         self.did = did
-        databaseDir = 'ledger_copy.db'
         if not os.path.isdir(databaseDir):
             print('Local ledger database not found; creating a new one')
         # _db should not be modified directly, as len(_db) may no longer
