@@ -63,7 +63,6 @@ def getTimestamp(dateStr):
 # Connects to the specified ledger and updates it until the latest txn
 # has been downloaded
 async def loadTxnsLocally(args, startTimestamp, endTimestamp):
-    print(args.database_dir)
     ll = LocalLedger(args.database_dir, args.pool_name, args.wallet_name,
                      args.wallet_key, args.signing_did)
     # first updates the local ledger database
@@ -227,9 +226,8 @@ def calculateBills(feesByTimePeriod, txns):
     return bills
 
 
-async def main():
+async def run(args):
 
-    args = parseArgs()
 
     # convert input args to timestamps
     startTimestamp = getTimestamp(args.start_date)
@@ -255,7 +253,6 @@ async def main():
     bills = calculateBills(feesByTimePeriod, txns)
     outputBillsFile(startTimestamp, endTimestamp, bills)
 
-    return sorted(bills.items())
     # Prints all schema keys
     # for t in txnsByType['102']:
     #    print('\n\n')
@@ -263,8 +260,11 @@ async def main():
 
 
 if __name__ == '__main__':
+    args = parseArgs()
     try:
         loop = asyncio.get_event_loop()
-        loop.run_until_complete(main())
+        loop.run_until_complete(run(args))
     except KeyboardInterrupt:
         pass
+    except RuntimeError:
+        run(args)
