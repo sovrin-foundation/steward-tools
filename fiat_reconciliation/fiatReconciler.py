@@ -38,9 +38,9 @@ def parseArgs():
     parser.add_argument(
         "signing_did", help="did used to sign requests sent to the ledger")
     parser.add_argument(
-        "start_date", help="mm/dd/yyyy time to start looking at txns")
+        "start_date", help="mm-dd-yyyy time to start looking at txns")
     parser.add_argument(
-        "end_date", help="mm/dd/yyyy time to stop looking at txns, inclusive")
+        "end_date", help="mm-dd-yyyy time to stop looking at txns, inclusive")
     parser.add_argument(
         "database_dir", help="optional field to indicate which database dir",
         default="ledger_copy.db", nargs='?')
@@ -54,7 +54,10 @@ def getTimestampStr(date):
 
 # Converts a mm/dd/yyyy string into a POSIX timestamp
 def getTimestamp(dateStr):
-    return time.mktime(datetime.strptime(dateStr, "%m/%d/%Y").timetuple())
+    try:
+        return time.mktime(datetime.strptime(dateStr, "%m-%d-%Y").timetuple())
+    except ValueError:
+        return time.mktime(datetime.strptime(dateStr, "%m/%d/%Y").timetuple())
 
 
 # Connects to the specified ledger and updates it until the latest txn
@@ -94,9 +97,9 @@ def printFeesInPeriod(txns, txnsByType, fees, startTimestamp, endTimestamp):
     totalCost = totalNymCost + totalAttribCost + totalSchemaCost + totalCDCost
 
     startTimeStr = str(datetime.utcfromtimestamp(
-        startTimestamp).strftime('%m/%d/%Y %H:%M:%S'))
+        startTimestamp).strftime('%m-%d-%Y %H:%M:%S'))
     endTimeStr = str(datetime.utcfromtimestamp(
-        endTimestamp).strftime('%m/%d/%Y %H:%M:%S'))
+        endTimestamp).strftime('%m-%d-%Y %H:%M:%S'))
 
     # only list amounts if they are > 0
     print('Period: ' + startTimeStr + ' to ' + endTimeStr)
