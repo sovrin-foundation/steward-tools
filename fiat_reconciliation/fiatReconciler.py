@@ -49,7 +49,7 @@ def parseArgs():
 
 # Converts a POSIX timestamp into a mm/dd/yyyy date
 def getTimestampStr(date):
-    return str(datetime.utcfromtimestamp(date).strftime('%m-%d-%Y'))
+    return str(datetime.utcfromtimestamp(date).strftime('%Y-%m-%d'))
 
 
 # Converts a mm/dd/yyyy string into a POSIX timestamp
