@@ -228,10 +228,17 @@ def calculateBills(feesByTimePeriod, txns):
 
 async def run(args):
 
+    try:
+        # convert input args to timestamps
+        startTimestamp = getTimestamp(args.start_date)
+        endTimestamp = getTimestamp(args.end_date)
+    except ValueError:
+        print('Error: Bad date info')
+        return
 
-    # convert input args to timestamps
-    startTimestamp = getTimestamp(args.start_date)
-    endTimestamp = getTimestamp(args.end_date)
+    if startTimestamp > endTimestamp:
+        print('Error: start timestamp must be before end timestamp')
+        return
 
     # all transactions in the specified range
     txns = await loadTxnsLocally(args, startTimestamp, endTimestamp)
