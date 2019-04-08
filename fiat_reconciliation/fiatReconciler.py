@@ -57,7 +57,12 @@ def getTimestamp(dateStr):
     try:
         return time.mktime(datetime.strptime(dateStr, "%m-%d-%Y").timetuple())
     except ValueError:
-        return time.mktime(datetime.strptime(dateStr, "%m/%d/%Y").timetuple())
+        try:
+            return time.mktime(
+                datetime.strptime(dateStr, "%m/%d/%Y").timetuple())
+        except ValueError:
+            return time.mktime(
+                datetime.strptime(dateStr, "%Y-%m-%d").timetuple())
 
 
 # Connects to the specified ledger and updates it until the latest txn
