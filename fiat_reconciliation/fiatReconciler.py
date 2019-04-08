@@ -233,11 +233,10 @@ async def run(args):
         startTimestamp = getTimestamp(args.start_date)
         endTimestamp = getTimestamp(args.end_date)
     except ValueError:
-        print('Error: Bad date info')
-        return
+        raise Exception('Bad date info')
 
     if startTimestamp > endTimestamp:
-        print('Error: start timestamp must be before end timestamp')
+        raise Exception('Start timestamp must be before end timestamp')
         return
 
     # all transactions in the specified range
