@@ -164,8 +164,8 @@ def getTxnRange(ledger, startTime=None, endTime=None,
             endSeqNo -= 1
     if startSeqNo < 1 or endSeqNo < startSeqNo:
         if ((isinstance(ledger, LocalLedger) and
-                endSeqNo > getTxnCount(ledger)) or isinstance(ledger, dict and
-                endSeqNo > max(ledger.keys()))):  # nopep8  # noqa: E128
+                endSeqNo > getTxnCount(ledger)) or isinstance(ledger, dict) and
+                endSeqNo > max(ledger.keys())):  # nopep8  # noqa: E128
             raise Exception("invalid start/end times")
     if startSeqNo is None or endSeqNo is None:
         raise Exception('Must specify a start and end')
