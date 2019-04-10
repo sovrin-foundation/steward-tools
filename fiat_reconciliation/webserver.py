@@ -1,3 +1,4 @@
+# Author: Ryan West ryanwest6@gmail.com
 from fiatReconciler import run
 from aiohttp import web
 import sys
