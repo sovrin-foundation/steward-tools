@@ -47,12 +47,12 @@ def parseArgs():
     return parser.parse_args()
 
 
-# Converts a POSIX timestamp into a mm/dd/yyyy date
+# Converts a POSIX timestamp into a yyyy/mm/dd date
 def getTimestampStr(date):
     return str(datetime.utcfromtimestamp(date).strftime('%Y-%m-%d'))
 
 
-# Converts a mm/dd/yyyy string into a POSIX timestamp
+# Converts a string into a POSIX timestamp
 def getTimestamp(dateStr):
     try:
         return time.mktime(datetime.strptime(dateStr, "%m-%d-%Y").timetuple())
