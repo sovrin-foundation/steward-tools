@@ -43,7 +43,7 @@ class LocalLedger():
         self.wallet_handle = None
 
     def __exit__(self, exc_type, exc_value, traceback):
-        delete self._db
+        del self._db
 
     async def connect(self):
         '''Connects to the pool specified in the constructor, using given
