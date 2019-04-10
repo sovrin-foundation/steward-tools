@@ -27,14 +27,12 @@ class LocalLedger():
     need to be implemented in indy-sdk.
     '''
 
-    def __init__(self, filename, poolname, walletname, key, did):
+    def __init__(self, databaseDir, poolname, walletname, key, did):
         '''Setup for inital use'''
-        self.filename = filename
         self.poolname = poolname
         self.walletname = walletname
         self.key = key
         self.did = did
-        databaseDir = 'ledger_copy.db'
         if not os.path.isdir(databaseDir):
             print('Local ledger database not found; creating a new one')
         # _db should not be modified directly, as len(_db) may no longer
@@ -43,6 +41,9 @@ class LocalLedger():
             databaseDir, rocksdb.Options(create_if_missing=True))
         self.pool_handle = None
         self.wallet_handle = None
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        del self._db
 
     async def connect(self):
         '''Connects to the pool specified in the constructor, using given
@@ -100,7 +101,7 @@ class LocalLedger():
         ''' Downloads new transactions to sync local db with the remote.
             limit: highest txn sequence number to get before stopping'''
 
-        if limit < 1:
+        if limit is not None and limit < 1:
             raise Exception('Limit must be at least 1')
 
         # gets the last sequence number stored locally and updates from there

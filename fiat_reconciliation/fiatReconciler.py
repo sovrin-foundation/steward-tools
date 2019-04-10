@@ -38,34 +38,47 @@ def parseArgs():
     parser.add_argument(
         "signing_did", help="did used to sign requests sent to the ledger")
     parser.add_argument(
-        "start_date", help="mm/dd/yyyy time to start looking at txns")
+        "start_date", help="mm-dd-yyyy time to start looking at txns")
     parser.add_argument(
-        "end_date", help="mm/dd/yyyy time to stop looking at txns, inclusive")
+        "end_date", help="mm-dd-yyyy time to stop looking at txns, inclusive")
+    parser.add_argument(
+        "database_dir", help="optional field to indicate which database dir",
+        default="ledger_copy.db", nargs='?')
     return parser.parse_args()
 
 
-# Converts a POSIX timestamp into a mm/dd/yyyy date
+# Converts a POSIX timestamp into a yyyy/mm/dd date
 def getTimestampStr(date):
-    return str(datetime.utcfromtimestamp(date).strftime('%m-%d-%Y'))
+    return str(datetime.utcfromtimestamp(date).strftime('%Y-%m-%d'))
 
 
-# Converts a mm/dd/yyyy string into a POSIX timestamp
+# Converts a string into a POSIX timestamp
 def getTimestamp(dateStr):
-    return time.mktime(datetime.strptime(dateStr, "%m/%d/%Y").timetuple())
+    try:
+        return time.mktime(datetime.strptime(dateStr, "%m-%d-%Y").timetuple())
+    except ValueError:
+        try:
+            return time.mktime(
+                datetime.strptime(dateStr, "%m/%d/%Y").timetuple())
+        except ValueError:
+            return time.mktime(
+                datetime.strptime(dateStr, "%Y-%m-%d").timetuple())
 
 
 # Connects to the specified ledger and updates it until the latest txn
 # has been downloaded
 async def loadTxnsLocally(args, startTimestamp, endTimestamp):
-    ll = LocalLedger("ledger_copy.db", args.pool_name, args.wallet_name,
+    ll = LocalLedger(args.database_dir, args.pool_name, args.wallet_name,
                      args.wallet_key, args.signing_did)
     # first updates the local ledger database
     await ll.connect()
     await ll.update()
     await ll.disconnect()
+
     return lq.getTxnRange(ll, startTime=startTimestamp, endTime=endTimestamp)
 
 
+# TODO: fix so this works when using fees that update over time
 # Gets all txns within the specified period (using startTimeStamp and
 # stopTimeStamp), then totals the fees for each txn type and prints them
 def printFeesInPeriod(txns, txnsByType, fees, startTimestamp, endTimestamp):
@@ -88,9 +101,9 @@ def printFeesInPeriod(txns, txnsByType, fees, startTimestamp, endTimestamp):
     totalCost = totalNymCost + totalAttribCost + totalSchemaCost + totalCDCost
 
     startTimeStr = str(datetime.utcfromtimestamp(
-        startTimestamp).strftime('%m/%d/%Y %H:%M:%S'))
+        startTimestamp).strftime('%m-%d-%Y %H:%M:%S'))
     endTimeStr = str(datetime.utcfromtimestamp(
-        endTimestamp).strftime('%m/%d/%Y %H:%M:%S'))
+        endTimestamp).strftime('%m-%d-%Y %H:%M:%S'))
 
     # only list amounts if they are > 0
     print('Period: ' + startTimeStr + ' to ' + endTimeStr)
@@ -124,7 +137,7 @@ def outputBillsFile(startTimestamp, endTimestamp, bills):
 
     filename = 'billing ' + startTimeStr + ' to ' + endTimeStr + '.csv'
     with open(filename, 'w') as f:
-        for key, value in bills.items():
+        for key, value in sorted(bills.items()):
             f.write(str(key) + ',' + str(value) + '\n')
 
     print('Billing by did written to \'' + filename + '\'.')
@@ -188,6 +201,10 @@ def calculateBills(feesByTimePeriod, txns):
     def _getFeeForTxn(txn, feesByTimePeriod):
         lastTimestamp = 0
         txnTimestamp = txn.getTime()
+        # if there is no timestamp, then it is most likely a genesis txn so
+        # do not charge anything
+        if txnTimestamp is None:
+            return 0
         for timestamp, fees in sorted(feesByTimePeriod.items()):
             if txnTimestamp < timestamp:
                 break
@@ -205,30 +222,33 @@ def calculateBills(feesByTimePeriod, txns):
         else:
             bills[t.getSenderDid()] += _getFeeForTxn(t, feesByTimePeriod)
 
+    # If authorless genesis txns are in the range, we don't include these
+    bills.pop(None, None)
+
+    for b in bills:
+        if b == 0:
+            print(b)
     return bills
 
 
-async def main():
+async def run(args):
 
-    args = parseArgs()
+    try:
+        # convert input args to timestamps
+        startTimestamp = getTimestamp(args.start_date)
+        endTimestamp = getTimestamp(args.end_date)
+    except ValueError:
+        raise Exception('Bad date info')
 
-    # convert input args to timestamps
-    startTimestamp = getTimestamp(args.start_date)
-    endTimestamp = getTimestamp(args.end_date)
+    if startTimestamp > endTimestamp:
+        raise Exception('Start timestamp must be before end timestamp')
+        return
 
     # all transactions in the specified range
     txns = await loadTxnsLocally(args, startTimestamp, endTimestamp)
 
     # transactions separated by type in the format key: type, val: list(txns)
     txnsByType = {}
-    # dict of how much each transaction type currently costs
-    fees = {}
-
-    # TODO: retrieve ledger fees from json/yaml implementation
-    fees['1'] = 10
-    fees['100'] = 10
-    fees['101'] = 50
-    fees['102'] = 25
 
     for t in txns.values():
         # populate txnsByType dict
@@ -237,11 +257,10 @@ async def main():
         else:
             txnsByType[t.getType()].append(t)
 
-    printFeesInPeriod(txns, txnsByType, fees,
-                      startTimestamp, endTimestamp)
-
     # retrive fiat fees
     feesByTimePeriod = getFiatFees()
+    # printFeesInPeriod(txns, txnsByType, feesByTimePeriod,
+    #                  startTimestamp, endTimestamp)
     bills = calculateBills(feesByTimePeriod, txns)
     outputBillsFile(startTimestamp, endTimestamp, bills)
 
@@ -252,8 +271,11 @@ async def main():
 
 
 if __name__ == '__main__':
+    args = parseArgs()
     try:
         loop = asyncio.get_event_loop()
-        loop.run_until_complete(main())
+        loop.run_until_complete(run(args))
     except KeyboardInterrupt:
         pass
+    except RuntimeError:
+        run(args)
