@@ -12,6 +12,7 @@ This is the simple GUI utility for minting tokens based on [Indy-Sdk](https://gi
 
 ### Data
 * Wallet with a DID on that ledger. This can be done using the [Indy-CLI](https://github.com/hyperledger/indy-sdk).
+* Other configuration options are pulled from a shared file so that all trustees use the same values. The configuration file is specified in src.constants.CONFIG_URL
 
 ### Run
     `python3 run.py`
