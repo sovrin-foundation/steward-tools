@@ -26,8 +26,8 @@ This is the simple GUI utility for minting tokens based on [Indy-Sdk](https://gi
     ```
 
 * Windows
- * Download `libsovtoken.dll` from https://repo.sovrin.org/test/windows/token-minter/
- * Add path to `libsovtoken.dll` to `PATH` environment variable.
- * [Install Indy](https://github.com/hyperledger/indy-sdk#windows)
- * Download `token-minter.exe` from https://repo.sovrin.org/test/windows/token-minter/
- * Run token-minter.exe
+  * Download `libsovtoken.dll` from https://repo.sovrin.org/test/windows/token-minter/
+  * Add path to `libsovtoken.dll` to `PATH` environment variable.
+  * [Install Indy](https://github.com/hyperledger/indy-sdk#windows)
+  * Download `token-minter.exe` from https://repo.sovrin.org/test/windows/token-minter/
+  * Run token-minter.exe
