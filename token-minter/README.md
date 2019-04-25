@@ -31,3 +31,13 @@ This is the simple GUI utility for minting tokens based on [Indy-Sdk](https://gi
  * [Install Indy](https://github.com/hyperledger/indy-sdk#windows)
  * Download `token-minter.exe` from https://repo.sovrin.org/test/windows/token-minter/
  * Run token-minter.exe
+
+* MacOs
+ * Build `libindy` https://github.com/hyperledger/indy-sdk by `cargo build` command.
+    * Copy `libindy.dylib` either : 
+        * to `/user/local/lib/` folder
+        * to any `/User/tmp/` and set `DYLIB_LIBRARY_PATH` env variable to this folder.
+ * Build `libsovtoken` https://github.com/sovrin-foundation/libsovtoken by `cargo build` by cargo build.
+ * Copy `libsovtoken.dylib`to the same folder as you did for `libindy.dylib`.
+ * Install indy python wrapper: `pip3 install python3-indy`.
+ * Run `token-minter` from python sources by `python3 src/main.py`.
