@@ -12,9 +12,10 @@ This is the simple GUI utility for minting tokens based on [Indy-Sdk](https://gi
 
 ### Data
 * Wallet with a DID on that ledger. This can be done using the [Indy-CLI](https://github.com/hyperledger/indy-sdk).
+* Other configuration options are pulled from a shared file so that all trustees use the same values. The configuration file is specified in src.constants.CONFIG_URL
 
 ### Run
-    `python3 src/main.py`
+    `python3 run.py`
 
 ## Installation
 * Ubuntu
@@ -26,8 +27,8 @@ This is the simple GUI utility for minting tokens based on [Indy-Sdk](https://gi
     ```
 
 * Windows
- * Download `libsovtoken.dll` from https://repo.sovrin.org/test/windows/token-minter/
- * Add path to `libsovtoken.dll` to `PATH` environment variable.
- * [Install Indy](https://github.com/hyperledger/indy-sdk#windows)
- * Download `token-minter.exe` from https://repo.sovrin.org/test/windows/token-minter/
- * Run token-minter.exe
+  * Download `libsovtoken.dll` from https://repo.sovrin.org/test/windows/token-minter/
+  * Add path to `libsovtoken.dll` to `PATH` environment variable.
+  * [Install Indy](https://github.com/hyperledger/indy-sdk#windows)
+  * Download `token-minter.exe` from https://repo.sovrin.org/test/windows/token-minter/
+  * Run token-minter.exe
