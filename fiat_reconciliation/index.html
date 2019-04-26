@@ -84,8 +84,9 @@
 <body>
 	<h1>Fiat Reconciliation Billing Tool</h1>
 	<p>This tool stores a local copy of all the transactions on the main ledger. When run, it first downloads any new transactions, then calculates the amount that every transaction author owes in a given time period.</p>
-	<p>The output is in the form "&lt;DID&gt;,&lt;bill in USD&gt;".</p>
+	<p>The output is in the form "&lt;DID&gt;,&lt;total bill in USD&gt;, &lt;nym bill&gt;, &lt;attrib bill&gt;, &lt;schema bill&gt;, &lt;cred def bill&gt;, &lt;revocation registry bill&gt;, &lt;revocation registry update bill&gt;".</p>
 	<p>The fees associated with billing are stored in and read from <a href='https://docs.google.com/spreadsheets/d/1RFhQ4cOid7h_GoKZKNXudDSlFoyhbyq5U4gsqW4gthE'>this Google Doc</a>.</p>
+	<p>If this tool has not been run in a long time, it will take longer to return results because it needs to download new transactions first.</p>
 
 	<label for="startdate">Start Date:</label>
 	<input type="date" id="startdate" value="2019-01-01" min="2010-01-01">
