@@ -138,7 +138,7 @@ def outputBillsFile(startTimestamp, endTimestamp, bills):
     filename = 'billing ' + startTimeStr + ' to ' + endTimeStr + '.csv'
     with open(filename, 'w') as f:
         for key, value in sorted(bills.items()):
-            f.write(str(key) + ',' + str(value) + '\n')
+            f.write(str(key) + ',' + ",".join(str(x) for x in value) + '\n')
 
     print('Billing by did written to \'' + filename + '\'.')
 
@@ -195,7 +195,8 @@ def getFiatFees(csvFile='fiatFees.csv'):
 # TODO: add way to check if txn was token-based or fiat-based
 def calculateBills(feesByTimePeriod, txns):
     # dict of all DIDs who owe money for the current period
-    # in the form key: did, val: amount
+    # in the form key: did, val: list of amounts owed in the following order:
+    #     [total, nym, attrib, schema, cred_def, revog_reg, revoc_reg update]
     bills = {}
 
     def _getFeeForTxn(txn, feesByTimePeriod):
@@ -212,15 +213,27 @@ def calculateBills(feesByTimePeriod, txns):
 
         if lastTimestamp == 0:
             raise Exception('No fees found for transaction timestamp')
-
-        return feesByTimePeriod[lastTimestamp][txn.getType()]
+        # [total, nym, attrib, schema, cred_def, revoc_reg, revoc_reg update]
+        billList = [0, 0, 0, 0, 0, 0, 0]
+        billList[0] = feesByTimePeriod[lastTimestamp][txn.getType()]
+        if txn.getType() == nymTxn:
+            billList[1] = billList[0]
+        elif txn.getType() == attribTxn:
+            billList[2] = billList[0]
+        elif txn.getType() == schemaTxn:
+            billList[3] = billList[0]
+        elif txn.getType() == credDefTxn:
+            billList[4] = billList[0]
+        # TODO: add support for revoc_reg when these are finalized in code
+        return billList
 
     for t in txns.values():
         # populate bills dict
         if t.getSenderDid() not in bills:
             bills[t.getSenderDid()] = _getFeeForTxn(t, feesByTimePeriod)
         else:
-            bills[t.getSenderDid()] += _getFeeForTxn(t, feesByTimePeriod)
+            bills[t.getSenderDid()] = list(map(lambda x, y: x + y,
+                bills[t.getSenderDid()], _getFeeForTxn(t, feesByTimePeriod)))
 
     # If authorless genesis txns are in the range, we don't include these
     bills.pop(None, None)
