@@ -1,7 +1,7 @@
-CONFIG_URL = 'https://github.com/Artemkaaas/token-minter/raw/config/config.json'
+CONFIG_URL = 'https://raw.githubusercontent.com/sovrin-foundation/steward-tools/master/token-minter/config/config.json'
 PAYMENT_LIBRARY = 'sovtoken'
 PAYMENT_PREFIX = 'pay:sov:'
-POOL_NAME = 'minter_pool'
+POOL_NAME = 'trainingnet'
 HELP_TEXT = '''
 This is the simple utility for minting tokens based on Indy-Sdk and Libsovtoken libraries.
 
