@@ -1,0 +1,5 @@
+{
+  "payment_address": "pay:sov:fhcMYyUzUY9xGKNdgwZs3kfh9fCsuGhj2SAGukUQyta73c23G",
+  "tokens_amount": 100000,
+  "location_pool_transactions_genesis": "https://raw.githubusercontent.com/sovrin-foundation/sovrin/master/sovrin/pool_transactions_training_genesis"
+}
