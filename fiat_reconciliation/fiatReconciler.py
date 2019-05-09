@@ -68,14 +68,14 @@ def getTimestamp(dateStr):
 # Connects to the specified ledger and updates it until the latest txn
 # has been downloaded
 async def loadTxnsLocally(args, startTimestamp, endTimestamp):
-    ll = LocalLedger(args.database_dir, args.pool_name, args.wallet_name,
-                     args.wallet_key, args.signing_did)
-    # first updates the local ledger database
-    await ll.connect()
-    await ll.update()
-    await ll.disconnect()
-
-    return lq.getTxnRange(ll, startTime=startTimestamp, endTime=endTimestamp)
+    with LocalLedger(args.database_dir, args.pool_name, args.wallet_name,
+                     args.wallet_key, args.signing_did) as ll:
+        # first updates the local ledger database
+        await ll.connect()
+        await ll.update()
+        await ll.disconnect()
+    
+        return lq.getTxnRange(ll, startTime=startTimestamp, endTime=endTimestamp)
 
 
 # TODO: fix so this works when using fees that update over time

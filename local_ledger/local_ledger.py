@@ -42,6 +42,9 @@ class LocalLedger():
         self.pool_handle = None
         self.wallet_handle = None
 
+    def __enter__(self):
+        return self
+
     def __exit__(self, exc_type, exc_value, traceback):
         del self._db
 
