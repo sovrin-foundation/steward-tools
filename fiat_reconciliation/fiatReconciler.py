@@ -238,9 +238,6 @@ def calculateBills(feesByTimePeriod, txns):
     # If authorless genesis txns are in the range, we don't include these
     bills.pop(None, None)
 
-    for b in bills:
-        if b == 0:
-            print(b)
     return bills
 
 
@@ -259,23 +256,30 @@ async def run(args):
 
     # all transactions in the specified range
     txns = await loadTxnsLocally(args, startTimestamp, endTimestamp)
-    # transactions separated by type in the format key: type, val: list(txns)
-    txnsByType = {}
 
-    for t in txns.values():
-        # populate txnsByType dict
-        if t.getType() not in txnsByType:
-            txnsByType[t.getType()] = [t]
-        else:
-            txnsByType[t.getType()].append(t)
+    # the commented code below provides additional ledger statistics and can
+    # be uncommented if desired
+
+    # transactions separated by type in the format key: type, val: list(txns)
+    # txnsByType = {}
+    #for t in txns.values():
+    #    # populate txnsByType dict
+    #    if t.getType() not in txnsByType:
+    #        txnsByType[t.getType()] = [t]
+    #    else:
+    #        txnsByType[t.getType()].append(t)
+
     # retrive fiat fees
     feesByTimePeriod = getFiatFees()
+
     # printFeesInPeriod(txns, txnsByType, feesByTimePeriod,
     #                  startTimestamp, endTimestamp)
+
     bills = calculateBills(feesByTimePeriod, txns)
     outputBillsFile(startTimestamp, endTimestamp, bills)
+
     # Prints all schema keys
-    # for t in txnsByType['102']:
+    # for t in txnsByType['101']:
     #    print('\n\n')
     #    t.printKeys()
 
