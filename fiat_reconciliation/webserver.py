@@ -4,9 +4,9 @@ from aiohttp import web
 import sys
 import asyncio
 import os.path
-path = os.path.expanduser("~") + '/steward-tools/fiat_reconciliation/'
+path =  '/home/ryanwest6/steward-tools/fiat_reconciliation/'
 sys.path.append(path)
-sys.path.append(os.path.expanduser("~") + '/steward-tools/local_ledger')
+sys.path.append('/home/ryanwest6/steward-tools/local_ledger')
 
 gotResponse = True
 
