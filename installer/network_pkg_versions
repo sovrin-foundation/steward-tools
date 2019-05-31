@@ -21,12 +21,12 @@ stagingnet:
   sovtokenfees: "0.9.11"
 
 mainnet:
-  indy-node: "1.6.83"
+  indy-node: "1.7.1"
   sovrin: "1.1.6"
-  libindy: "1.8.1"
-  libnullpay: "1.8.1"
+  libindy: "1.8.3"
+  libnullpay: "1.8.3"
   libvcx: "0.2.34516997-f3254f8"
-  indy-cli: "1.8.1"
+  indy-cli: "1.8.3"
   libsovtoken: "None"
   sovtoken: "None"
   sovtokenfees: "None"
