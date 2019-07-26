@@ -102,17 +102,21 @@ def print_targets(items):
     print()
 
 
-def ensure_transaction_result(response, targets):
+def ensure_payment_transaction_result(pool_handle, response, targets):
     logging.debug("Load Payment Library")
 
     load_payment_plugin()
 
-    receipts = parse_payment_request(response)
+    receipts = parse_payment_response(response)
+    to_verifies = []
 
     for target in targets:
         matches = [receipt for receipt in receipts if target["paymentAddress"] == receipt['recipient']]
         if len(matches) != 1:
             raise Exception('Payment failed for {}'.format(target["paymentAddress"]))
+        to_verifies.append(matches[0]['receipt'])
+
+    verify_payment_on_ledger(pool_handle, to_verifies)
 
 
 def prepare(args):
@@ -270,7 +274,7 @@ def publish(args):
 
     print("Checking result of transaction...")
 
-    ensure_transaction_result(response, data['targets'])
+    ensure_payment_transaction_result(pool_handle, response, data['targets'])
 
     print("Sending emails to recipients...")
 
@@ -311,14 +315,11 @@ if __name__ == '__main__':
                         help='[INPUT] file containing information required for email sending')
     args = parser.parse_args()
 
-    try:
-        if args.action == 'prepare':
-            prepare(args)
-        elif args.action == 'build':
-            build(args)
-        elif args.action == 'publish':
-            publish(args)
-        else:
-            pass
-    except Exception as err:
-        print("     ERROR occurred: {}".format(str(err)))
+    if args.action == 'prepare':
+        prepare(args)
+    elif args.action == 'build':
+        build(args)
+    elif args.action == 'publish':
+        publish(args)
+    else:
+        pass
