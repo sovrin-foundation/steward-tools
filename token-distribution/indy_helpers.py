@@ -136,7 +136,7 @@ def handle_payment_error(err: IndyError):
     if err.error_code == ErrorCode.CommonInvalidStructure:
         raise Exception('Invalid payment address has been provided')
     if err.error_code == ErrorCode.PaymentExtraFundsError:
-        raise Exception('Insufficient funds on inputs')
+        raise Exception('Extra funds on inputs')
     if err.error_code == ErrorCode.PaymentInsufficientFundsError:
         raise Exception('Insufficient funds on inputs')
     if err.error_code == ErrorCode.PaymentUnknownMethodError:

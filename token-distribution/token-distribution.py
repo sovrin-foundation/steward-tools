@@ -32,8 +32,8 @@ def parse_input_data(file) -> (dict, list):
         {
             'legalName': row[0],
             'tokensAmount': row[1],
-            'email': row[2],
-            'paymentAddress': row[3]
+            'paymentAddress': row[2],
+            'email': row[3]
         }
         for row in data]
     return source, targets
@@ -60,6 +60,9 @@ def prepare_payment_data(source_payment_address, sources, targets):
             source_amount += source['amount']
         else:
             break
+
+    if source_amount < required_tokens:
+        raise Exception('Insufficient funds on inputs: required: {}, source: {}'.format(required_tokens, source_amount))
 
     if source_amount > required_tokens:
         outputs.append({
@@ -290,10 +293,11 @@ def send_emails(targets, email_info_file):
     print("-" * 50)
 
     for target in targets:
-        body = "{} {} {}".format(target['tokensAmount'], email_info['body'], target['paymentAddress'])
-        send_email(email_info['from'], target['email'], email_info['subject'], body, password)
-        print("Mail has been successfully sent to {}".format(target['email']))
-        print("-" * 50)
+        if target['email']:
+            body = "{} {} {}".format(target['tokensAmount'], email_info['body'], target['paymentAddress'])
+            send_email(email_info['from'], target['email'], email_info['subject'], body, password)
+            print("Mail has been successfully sent to {}".format(target['email']))
+            print("-" * 50)
 
 
 if __name__ == '__main__':

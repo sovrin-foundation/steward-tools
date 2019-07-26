@@ -10,37 +10,57 @@ To run the token-distribution script you must have the following dependencies in
 
 Run with this command:
 
-``` python3 token-distribution.py [action] [--dataFile] [--emailInfoFile]```
+``` python3 token-distribution.py [action] [--dataFile=/path] [--emailInfoFile=/path]```
 
-Actions:
-* prepare - prepare payment inputs and outputs for building Payment transaction
+## Workflow
+1. Prepare the data
 
-    Input:
-    * CSV file with following data:
-        * The first row of the document contains: the Payment address that payments will be taken from, the Wallet name, and the Wallet location
-        * The remaining rows of the spreadsheet contains: Legal name, Number of tokens to be transferred, Email address, and Payment address
-    * Pool Genesis Transactions - interactive input during execution
+    Starting with a spreadsheet exported as a CSV containing the following data:
+    * The first row:
+        * Payment address that payments will be taken from
+        * Wallet Name
+        * Wallet Location
+    * The remaining rows of the spreadsheet:
+        * Legal name of recipient
+        * Number of tokens to be transferred
+        * Payment address
+        * Email address for notification
 
-    Output: ZIP archive containing single JSON file with information required by other actions.
+    A text file containing the following data:
+    * The text of an email to be sent to users who receive tokens
+    * Connection information for sending the email
 
-    Example: `python3 token-distribution.py prepare --dataFile=/path/input_data.csv`
+    Note:  the text file containing information required only on the last step.
 
-* build - builds Payment transaction and Sign transaction according to data received after `prepare` action.
-It's recommended to perform this action on a different machine without network access.
+1. Prepare payment inputs and outputs for building Payment transaction.
 
-    Input:
-    * ZIP archive received after `prepare` action execution.
-    * Wallet Key - interactive input during execution
+    * On a machine with pool access run a script (with `prepare` action) that accepts the spreadsheet as input (`--dataFile` parameter).
+    * For each target row in the spreadsheet, a payment output with the specified number of tokens will be prepared.
+    * The list of the names and number of tokens for each payment output will be displayed to the user for confirmation.
+    * Upon receiving confirmation, the script will ask about a path to Pool Genesis Transactions to connect to Pool to get sources for doing the payment.
+    * Prepared data will be stored as a zip file by a user-supplied path (which will be on a USB thumb drive).
+    * The exported file will contain all the information required by the next actions.
 
-    Output: ZIP archive containing single JSON file with signed transaction and information required for sending on the ledger.
+    Example: `python3 token-distribution.py prepare --dataFile=/path/to/prepared/csv/file.csv`
 
-    Example: `python3 token-distribution.py build --dataFile=/path/result.zip`
+1. Build Payment transaction and Sign transaction according to data received after `prepare` action.
 
-* publish - publish Payment transaction on the ledger (do tokens transfer).
+    * On a machine without network access, but which has wallet access with the signing keys
+    run a script (with `build` action) that accepts zip file received after `prepare` action as input (`--dataFile` parameter).
+    * The list of the names and number of tokens for each payment output will be displayed to the user for confirmation.
+    * Upon receiving confirmation, the script will ask about a key for tha Wallet (this password is never stored), build and sign payment transaction.
+    * Transaction and additional data will be stored as a zip file by a user-supplied path (which will be on a USB thumb drive).
+    * The exported file will contain all the information required by the next action.
 
-    Input:
-    * ZIP archive received after `build` action execution.
-    * Connection information for sending the email (as `--emailInfoFile=` on script execution)
-    * Pool Genesis Transactions - interactive input during execution
+    Example: `python3 token-distribution.py build --dataFile=/path/to/previous/step/zip/file.zip`
 
-    Example: `python3 token-distribution.py build --dataFile=/path/result.zip --emailInfoFile=/path/email-info.json`
+
+1. Publish
+
+    * On a machine with pool access run a script (with `send` action)  that accepts zip file received after `build` action as input (`--dataFile` parameter).
+    * Pass `--emailInfoFile` parameter to point on JSON file containing the information for sending the notification email to token recipients.
+    * The list of the names and number of tokens for each payment output will be displayed to the user for confirmation.
+    * Upon receiving confirmation, the script will publish them to the global ledger.
+    * For each payment address that receives tokens, an email will be sent notifying the user that they have received X tokens. If no email is listed, then skip this action.
+
+    Example: `python3 token-distribution.py publish --dataFile=/path/to/previous/step/zip/file.zip --emailInfoFile=/path/email-info.json`
