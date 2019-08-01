@@ -296,12 +296,13 @@ def send_emails(targets, email_info_file):
 
     print("-" * 50)
 
-    for target in targets:
-        if target['email']:
-            body = "{} {} {}".format(target['tokensAmount'], email_info['body'], target['paymentAddress'])
-            send_email(email_info['from'], target['email'], email_info['subject'], body, password)
-            print("Mail has been successfully sent to {}".format(target['email']))
-            print("-" * 50)
+    targets = [{
+                   'to': target['email'],
+                   'body': "{} {} {}".format(target['tokensAmount'], email_info['body'], target['paymentAddress'])
+               }
+               for target in targets if target['email']]
+
+    send_email(email_info['from'], targets, email_info['subject'], password)
 
 
 if __name__ == '__main__':

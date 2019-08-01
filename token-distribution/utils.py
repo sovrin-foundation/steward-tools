@@ -1,5 +1,6 @@
 import platform
 import asyncio
+import smtplib
 from ctypes import cdll
 from pathlib import Path
 import csv
@@ -64,20 +65,27 @@ def store_zip_file(data):
     print("File has been create: {}".format(out_file))
 
 
+def send_email(from_, targets, subject_, password):
+    try:
+        server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+        server.ehlo()
+        server.login(from_, password)
+    except Exception as err:
+        print("Can not connect to email server" + str(err))
+        return
 
-def send_email(from_, to_, subject_, body_, password):
-    email_text = """\n\
-    From: %s
-    To: %s
-    Subject: %s
+    for target in targets:
+        email_text = """\n\
+        From: %s
+        To: %s
+        Subject: %s
 
-    %s
-    """ % (from_, to_, subject_, body_)
+        %s
+        """ % (from_, target['to'], subject_, target['body'])
 
-    print("Email: " + email_text)
-
-    # server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-    # server.ehlo()
-    # server.login(from_, password)
-    # server.sendmail(from_, to_, email_text)
-    # server.close()
+        try:
+            server.sendmail(from_, target['to'], email_text)
+            print("Mail has been successfully sent to {}".format(target['to']))
+        except Exception as err:
+            print("Sending email failed to {} with " + str(err))
+    server.close()
