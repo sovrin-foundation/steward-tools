@@ -17,10 +17,10 @@ import re
 # 8   - Machine is dedicated to the validator, no other services 
 #       Rule:ports_allowed
 #
-# 16  - Have 2 or more cores
+# 16  - Have 8 or more cores
 #       Rule: machine_hw_required
 #
-# 17  - Have at least 8GB of RAM and 1-2+TB of reliable disk space
+# 17  - Have at least 32GB of RAM and 1-2+TB of reliable disk space
 #       Rule: machine_hw_required
 #             [NOTE] Hardware raid detection is only checking if a card is present not setup
 #
@@ -102,7 +102,7 @@ rules = {
             "resources": {
                 "memory": ">= 32000000000",
                 "disk": {
-                    'path': "/var/indy",
+                    'path': "/var/lib/indy",
                     'size': ">= 1000000000000",
                     'raid': True
                 },
