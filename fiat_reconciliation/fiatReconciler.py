@@ -68,14 +68,14 @@ def getTimestamp(dateStr):
 # Connects to the specified ledger and updates it until the latest txn
 # has been downloaded
 async def loadTxnsLocally(args, startTimestamp, endTimestamp):
-    ll = LocalLedger(args.database_dir, args.pool_name, args.wallet_name,
-                     args.wallet_key, args.signing_did)
-    # first updates the local ledger database
-    await ll.connect()
-    await ll.update()
-    await ll.disconnect()
-
-    return lq.getTxnRange(ll, startTime=startTimestamp, endTime=endTimestamp)
+    with LocalLedger(args.database_dir, args.pool_name, args.wallet_name,
+                     args.wallet_key, args.signing_did) as ll:
+        # first updates the local ledger database
+        await ll.connect()
+        await ll.update()
+        await ll.disconnect()
+    
+        return lq.getTxnRange(ll, startTime=startTimestamp, endTime=endTimestamp)
 
 
 # TODO: fix so this works when using fees that update over time
@@ -198,14 +198,16 @@ def calculateBills(feesByTimePeriod, txns):
     # in the form key: did, val: list of amounts owed in the following order:
     #     [total, nym, attrib, schema, cred_def, revog_reg, revoc_reg update]
     bills = {}
-
     def _getFeeForTxn(txn, feesByTimePeriod):
+        # [total, nym, attrib, schema, cred_def, revoc_reg, revoc_reg update]
+        billList = [0, 0, 0, 0, 0, 0, 0]
+
         lastTimestamp = 0
         txnTimestamp = txn.getTime()
         # if there is no timestamp, then it is most likely a genesis txn so
         # do not charge anything
         if txnTimestamp is None:
-            return 0
+            return billList
         for timestamp, fees in sorted(feesByTimePeriod.items()):
             if txnTimestamp < timestamp:
                 break
@@ -213,8 +215,6 @@ def calculateBills(feesByTimePeriod, txns):
 
         if lastTimestamp == 0:
             raise Exception('No fees found for transaction timestamp')
-        # [total, nym, attrib, schema, cred_def, revoc_reg, revoc_reg update]
-        billList = [0, 0, 0, 0, 0, 0, 0]
         billList[0] = feesByTimePeriod[lastTimestamp][txn.getType()]
         if txn.getType() == nymTxn:
             billList[1] = billList[0]
@@ -251,15 +251,14 @@ async def run(args):
         startTimestamp = getTimestamp(args.start_date)
         endTimestamp = getTimestamp(args.end_date)
     except ValueError:
-        raise Exception('Bad date info')
+        raise ValueError('Bad date info')
 
     if startTimestamp > endTimestamp:
-        raise Exception('Start timestamp must be before end timestamp')
+        raise ValueError('Start timestamp must be before end timestamp')
         return
 
     # all transactions in the specified range
     txns = await loadTxnsLocally(args, startTimestamp, endTimestamp)
-
     # transactions separated by type in the format key: type, val: list(txns)
     txnsByType = {}
 
@@ -269,14 +268,12 @@ async def run(args):
             txnsByType[t.getType()] = [t]
         else:
             txnsByType[t.getType()].append(t)
-
     # retrive fiat fees
     feesByTimePeriod = getFiatFees()
     # printFeesInPeriod(txns, txnsByType, feesByTimePeriod,
     #                  startTimestamp, endTimestamp)
     bills = calculateBills(feesByTimePeriod, txns)
     outputBillsFile(startTimestamp, endTimestamp, bills)
-
     # Prints all schema keys
     # for t in txnsByType['102']:
     #    print('\n\n')

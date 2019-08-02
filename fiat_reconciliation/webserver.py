@@ -55,13 +55,17 @@ async def postHandle(request):
     # Runs the script and displays any errors
     try:
         gotResponse = False
-        await run(args)
+        await run(args)  # This actually calls the billing function
     except ValueError as e:
         print(e)
         gotResponse = True
         return web.Response(text='Error: Wrong date formatting')
     except Exception as e:
         print(e)
+        print('unknown error')
+        # this program crashes itself if a new error comes up. It is 
+        # restarted with a cronjob.
+        exit(-1)
         gotResponse = True
         return web.Response(text='Error: ' + str(e))
     outputFilename = 'billing ' + startdate.replace('/', '-') + ' to ' + \

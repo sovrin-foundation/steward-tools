@@ -123,7 +123,7 @@ def _getTxnByTimestamp(ledger, timestamp, contiguous=True):
             lowest = min(ledger.keys())
             highest = max(ledger.keys()) - 1
         else:
-            raise Exception('noncontiguous not yet implemented')
+            raise Exception('noncontiguous txns not yet implemented')
 
     # this occurs if there are 0 transactions in the storage
     if highest < lowest:
