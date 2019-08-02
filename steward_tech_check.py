@@ -100,9 +100,9 @@ rules = {
         },
         "machine_resources_required": {
             "resources": {
-                "memory": ">= 8589934592",
+                "memory": ">= 32000000000",
                 "disk": {
-                    'path': "/home/indy",
+                    'path': "/var/indy",
                     'size': ">= 1000000000000",
                     'raid': True
                 },
@@ -113,8 +113,7 @@ rules = {
         "procs_required": {
             'comment': '',
             'processes': [
-                ['/usr/sbin/ntpd', '/lib/systemd/systemd-timesyncd'],
-                '/usr/local/bin/start_indy_node'
+                ['/usr/sbin/ntpd', '/lib/systemd/systemd-timesyncd']
             ]
         },
         "firewalls_allowed": {
