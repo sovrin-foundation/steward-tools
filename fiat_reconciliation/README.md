@@ -4,7 +4,7 @@ This tool takes a ledger and time range and calculates how much the owner of eac
 
 The results are saved in a file called `billing [timerange].csv`. This comma separated file has two columns: DID, and total amount to bill for the period.
 
-As the details for the fiat payment option are still under revision, this method of calculating billing amounts is only a concept and, for the time being, should not be taken seriously.
+This tool relies on the Local Ledger tools also present in this repository, located [here](https://github.com/sovrin-foundation/steward-tools/tree/master/local_ledger).
 
 ## Usage
 
