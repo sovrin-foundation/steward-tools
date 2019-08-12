@@ -1,0 +1,7 @@
+{
+  "host": "smtp.gmail.com",
+  "port": 465,
+  "from": "Sovrin@email.com",
+  "to": "TargetSovrin@email.com",
+  "subject": "Balance Checker"
+}
