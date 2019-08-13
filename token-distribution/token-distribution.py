@@ -108,15 +108,17 @@ def ensure_payment_transaction_result(pool_handle, response, targets):
     load_payment_plugin()
 
     receipts = parse_payment_response(response)
-    to_verifies = []
 
-    for target in targets:
-        matches = [receipt for receipt in receipts if target["paymentAddress"] == receipt['recipient']]
-        if len(matches) != 1:
-            raise Exception('Payment failed for {}'.format(target["paymentAddress"]))
-        to_verifies.append(matches[0]['receipt'])
+    if len(receipts) == 0:
+        raise Exception('Payment failed: There is no any receipts')
 
-    verify_payment_on_ledger(pool_handle, to_verifies)
+    expected = set([target["paymentAddress"] for target in targets])
+    actual = set([receipt['recipient'] for receipt in receipts])
+
+    if expected > actual:
+        raise Exception('Payment failed for {}'.format(expected - actual))
+
+    verify_payment_on_ledger(pool_handle, receipts[0]['receipt'])
 
 
 def prepare(args):
