@@ -5,6 +5,8 @@ import smtplib
 from ctypes import cdll
 from getpass import getpass
 from pathlib import Path
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 from constants import LIBRARY
 
@@ -47,7 +49,8 @@ def send_email(fails, email_info_file):
         print("No information for email sending found: {}".format(err))
         return
 
-    password = getpass("Enter Password for Email Account \"{}\":   ".format(email_info['from']))
+    password = email_info["password"] if "password" in email_info else getpass(
+        "Enter Password for Email Account \"{}\":   ".format(email_info['from']))
 
     lines = ["Payment Address: {},    Expected Tokens: {},    Actual Tokens: {}".format(
         address, values['expected'], values['actual']) for address, values in fails.items()]
@@ -65,16 +68,23 @@ def send_email(fails, email_info_file):
         print("Can not connect to email server: {}".format(err))
         return
 
-    email_text = """\n\
-    From: %s
-    To: %s
-    Subject: %s
+    message = MIMEMultipart()
 
-    %s
-    """ % (email_info['from'], email_info['to'], email_info['subject'], body)
+    message['From'] = email_info['from']
+    message['To'] = email_info['to']
+    message['Subject'] = email_info['subject']
+
+    email_text = """\
+Token Balance check failed
+The following discrepancies were found:
+
+%s
+    """ % ("\n".join(lines))
+
+    message.attach(MIMEText(email_text, 'plain'))
 
     try:
-        server.sendmail(email_info['from'], email_info['to'], email_text)
+        server.sendmail(email_info['from'], email_info['to'], message.as_string())
         print("Mail has been successfully sent to {}".format(email_info['to']))
     except Exception as err:
         print("Sending email to {} failed with {}".format(email_info['to'], err))
