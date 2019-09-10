@@ -35,7 +35,7 @@ pay:sov:PEMYpH2L8Raob6nysWfCB1KajZygX1AJnaLzHT1eSo8YNxu1d,200
 ### Run cron job
 *  on Unix OS with using `crontab` library.
     1) edit the crontab file using the command: `crontab -e`
-    2) add a new line `0 0 * * * ./balance-checker.py --dataFile=/path/to/input_data.csv --emailInfoFile=/path/to/email-info.json` - this implies running every day at midnight (* - Minute * - Hour * - Day * - Month * - Day of week).
+    2) add a new line `0 0 * * * python3 /path/to/balance-checker.py --dataFile=/path/to/input_data.csv --emailInfoFile=/path/to/email-info.json` - this implies running every day at midnight (* - Minute * - Hour * - Day * - Month * - Day of week).
     3) save the file
 
 
