@@ -9,7 +9,7 @@ ledger auth-rule action=ADD field=role txn_type=NYM old_value=* new_value=101 co
 
 ledger auth-rule action=ADD field=role txn_type=NYM old_value=* new_value=201 constraint="{"constraint_id":"OR","auth_constraints":[{"sig_count":1,"role":"0","constraint_id":"ROLE","need_to_be_owner":false},{"sig_count":1,"role":"2","constraint_id":"ROLE","need_to_be_owner":false},{"sig_count":1,"role":"201","constraint_id":"ROLE","need_to_be_owner":false}]}"
 
-ledger auth-rule action=ADD field=role txn_type=NYM old_value=* constraint="{"constraint_id":"OR","auth_constraints":[{"sig_count":1,"role":"101","constraint_id":"ROLE","need_to_be_owner":false},{"sig_count":0,"role":"*","metadata":{"fees":"did"},"constraint_id":"ROLE","need_to_be_owner":false}]}"
+ledger auth-rule action=ADD field=role txn_type=NYM old_value=* constraint="{"constraint_id":"OR","auth_constraints":[{"sig_count":1,"role":"101","constraint_id":"ROLE","need_to_be_owner":false}]}"
 
 ledger auth-rule action=EDIT field=role txn_type=NYM old_value=0 new_value=2 constraint="{"sig_count":3,"role":"0","constraint_id":"ROLE","need_to_be_owner":false}"
 
@@ -51,15 +51,15 @@ ledger auth-rule action=EDIT field=role txn_type=NYM new_value=101 constraint="{
 
 ledger auth-rule action=EDIT field=role txn_type=NYM new_value=201 constraint="{"sig_count":3,"role":"0","constraint_id":"ROLE","need_to_be_owner":false}"
 
-ledger auth-rule action=EDIT field=verkey txn_type=NYM old_value=* new_value=* constraint="{"constraint_id":"OR","auth_constraints":[{"sig_count":1,"role":"0","constraint_id":"ROLE","need_to_be_owner":true},{"sig_count":1,"role":"2","constraint_id":"ROLE","need_to_be_owner":true},{"sig_count":1,"role":"101","constraint_id":"ROLE","need_to_be_owner":true},{"sig_count":1,"role":"201","constraint_id":"ROLE","need_to_be_owner":true},{"sig_count":1,"role":"*","metadata":{"fees":"key_rotation"},"constraint_id":"ROLE","need_to_be_owner":true}]}"
+ledger auth-rule action=EDIT field=verkey txn_type=NYM old_value=* new_value=* constraint="{"constraint_id":"OR","auth_constraints":[{"sig_count":1,"role":"0","constraint_id":"ROLE","need_to_be_owner":true},{"sig_count":1,"role":"2","constraint_id":"ROLE","need_to_be_owner":true},{"sig_count":1,"role":"101","constraint_id":"ROLE","need_to_be_owner":true},{"sig_count":1,"role":"201","constraint_id":"ROLE","need_to_be_owner":true}]}"
 
-ledger auth-rule action=ADD field=* txn_type=ATTRIB old_value=* new_value=* constraint="{"constraint_id":"OR","auth_constraints":[{"sig_count":1,"role":"0","constraint_id":"ROLE","need_to_be_owner":true},{"sig_count":1,"role":"2","constraint_id":"ROLE","need_to_be_owner":true},{"sig_count":1,"role":"101","constraint_id":"ROLE","need_to_be_owner":true},{"sig_count":1,"role":"201","constraint_id":"ROLE","need_to_be_owner":true},{"sig_count":1,"role":"*","metadata":{"fees":"attrib_add"},"constraint_id":"ROLE","need_to_be_owner":true}]}"
+ledger auth-rule action=ADD field=* txn_type=ATTRIB old_value=* new_value=* constraint="{"constraint_id":"OR","auth_constraints":[{"sig_count":1,"role":"0","constraint_id":"ROLE","need_to_be_owner":true},{"sig_count":1,"role":"2","constraint_id":"ROLE","need_to_be_owner":true},{"sig_count":1,"role":"101","constraint_id":"ROLE","need_to_be_owner":true},{"sig_count":1,"role":"201","constraint_id":"ROLE","need_to_be_owner":true}]}"
 
-ledger auth-rule action=EDIT field=* txn_type=ATTRIB old_value=* new_value=* constraint="{"constraint_id":"OR","auth_constraints":[{"sig_count":1,"role":"0","constraint_id":"ROLE","need_to_be_owner":true},{"sig_count":1,"role":"2","constraint_id":"ROLE","need_to_be_owner":true},{"sig_count":1,"role":"101","constraint_id":"ROLE","need_to_be_owner":true},{"sig_count":1,"role":"201","constraint_id":"ROLE","need_to_be_owner":true},{"sig_count":1,"role":"*","metadata":{"fees":"attrib_edit"},"constraint_id":"ROLE","need_to_be_owner":true}]}"
+ledger auth-rule action=EDIT field=* txn_type=ATTRIB old_value=* new_value=* constraint="{"constraint_id":"OR","auth_constraints":[{"sig_count":1,"role":"0","constraint_id":"ROLE","need_to_be_owner":true},{"sig_count":1,"role":"2","constraint_id":"ROLE","need_to_be_owner":true},{"sig_count":1,"role":"101","constraint_id":"ROLE","need_to_be_owner":true},{"sig_count":1,"role":"201","constraint_id":"ROLE","need_to_be_owner":true}]}"
 
-ledger auth-rule action=ADD field=* txn_type=SCHEMA old_value=* new_value=* constraint="{"constraint_id":"OR","auth_constraints":[{"sig_count":1,"role":"101","constraint_id":"ROLE","need_to_be_owner":false},{"sig_count":1,"role":"*","metadata":{"fees":"schema"},"constraint_id":"ROLE","need_to_be_owner":false}]}"
+ledger auth-rule action=ADD field=* txn_type=SCHEMA old_value=* new_value=* constraint="{"constraint_id":"OR","auth_constraints":[{"sig_count":1,"role":"101","constraint_id":"ROLE","need_to_be_owner":false}]}"
 
-ledger auth-rule action=ADD field=* txn_type=CLAIM_DEF old_value=* new_value=* constraint="{"constraint_id":"OR","auth_constraints":[{"sig_count":1,"role":"101","constraint_id":"ROLE","need_to_be_owner":false},{"sig_count":1,"role":"*","metadata":{"fees":"cred_def"},"constraint_id":"ROLE","need_to_be_owner":false}]}"
+ledger auth-rule action=ADD field=* txn_type=CLAIM_DEF old_value=* new_value=* constraint="{"constraint_id":"OR","auth_constraints":[{"sig_count":1,"role":"101","constraint_id":"ROLE","need_to_be_owner":false}]}"
 
 ledger auth-rule action=ADD field=services txn_type=NODE old_value=* new_value=['VALIDATOR'] constraint="{"sig_count":1,"role":"2","constraint_id":"ROLE","need_to_be_owner":false}"
 
@@ -89,13 +89,13 @@ ledger auth-rule action=EDIT field=action txn_type=POOL_CONFIG old_value=* new_v
 
 ledger auth-rule action=ADD field=* txn_type=GET_VALIDATOR_INFO old_value=* new_value=* constraint="{"constraint_id":"OR","auth_constraints":[{"sig_count":1,"role":"0","constraint_id":"ROLE","need_to_be_owner":false},{"sig_count":1,"role":"2","constraint_id":"ROLE","need_to_be_owner":false},{"sig_count":1,"role":"201","constraint_id":"ROLE","need_to_be_owner":false}]}"
 
-ledger auth-rule action=ADD field=* txn_type=REVOC_REG_DEF old_value=* new_value=* constraint="{"constraint_id":"OR","auth_constraints":[{"sig_count":1,"role":"101","constraint_id":"ROLE","need_to_be_owner":false},{"sig_count":1,"role":"*","metadata":{"fees":"rev_reg"},"constraint_id":"ROLE","need_to_be_owner":false}]}"
+ledger auth-rule action=ADD field=* txn_type=REVOC_REG_DEF old_value=* new_value=* constraint="{"constraint_id":"OR","auth_constraints":[{"sig_count":1,"role":"101","constraint_id":"ROLE","need_to_be_owner":false}]}"
 
 ledger auth-rule action=EDIT field=* txn_type=REVOC_REG_DEF old_value=* new_value=* constraint="{"sig_count":1,"role":"*","constraint_id":"ROLE","need_to_be_owner":true}"
 
-ledger auth-rule action=ADD field=* txn_type=REVOC_REG_ENTRY old_value=* new_value=* constraint="{"constraint_id":"OR","auth_constraints":[{"sig_count":1,"role":"0","constraint_id":"ROLE","need_to_be_owner":true},{"sig_count":1,"role":"2","constraint_id":"ROLE","need_to_be_owner":true},{"sig_count":1,"role":"101","constraint_id":"ROLE","need_to_be_owner":true},{"sig_count":1,"role":"*","metadata":{"fees":"rev_reg_update"},"constraint_id":"ROLE","need_to_be_owner":true}]}"
+ledger auth-rule action=ADD field=* txn_type=REVOC_REG_ENTRY old_value=* new_value=* constraint="{"constraint_id":"OR","auth_constraints":[{"sig_count":1,"role":"0","constraint_id":"ROLE","need_to_be_owner":true},{"sig_count":1,"role":"2","constraint_id":"ROLE","need_to_be_owner":true},{"sig_count":1,"role":"101","constraint_id":"ROLE","need_to_be_owner":true}]}"
 
-ledger auth-rule action=EDIT field=* txn_type=REVOC_REG_ENTRY old_value=* new_value=* constraint="{"constraint_id":"OR","auth_constraints":[{"sig_count":1,"role":"0","constraint_id":"ROLE","need_to_be_owner":true},{"sig_count":1,"role":"2","constraint_id":"ROLE","need_to_be_owner":true},{"sig_count":1,"role":"101","constraint_id":"ROLE","need_to_be_owner":true},{"sig_count":1,"role":"*","metadata":{"fees":"rev_reg_update"},"constraint_id":"ROLE","need_to_be_owner":true}]}"
+ledger auth-rule action=EDIT field=* txn_type=REVOC_REG_ENTRY old_value=* new_value=* constraint="{"constraint_id":"OR","auth_constraints":[{"sig_count":1,"role":"0","constraint_id":"ROLE","need_to_be_owner":true},{"sig_count":1,"role":"2","constraint_id":"ROLE","need_to_be_owner":true},{"sig_count":1,"role":"101","constraint_id":"ROLE","need_to_be_owner":true}]}"
 
 ledger auth-rule action=EDIT field=* txn_type=122 old_value=* new_value=* constraint="{"sig_count":3,"role":"0","constraint_id":"ROLE","need_to_be_owner":false}"
 
@@ -105,6 +105,6 @@ ledger auth-rule action=ADD field=* txn_type=5 old_value=* new_value=* constrain
 
 ledger auth-rule action=ADD field=* txn_type=10000 old_value=* new_value=* constraint="{"sig_count":3,"role":"0","constraint_id":"ROLE","need_to_be_owner":false}"
 
-ledger auth-rule action=ADD field=* txn_type=10001 old_value=* new_value=* constraint="{"constraint_id":"OR","auth_constraints":[{"sig_count":1,"role":"101","constraint_id":"ROLE","need_to_be_owner":false},{"sig_count":0,"role":"*","metadata":{"fees":"token_xfer"},"constraint_id":"ROLE","need_to_be_owner":false}]}"
+ledger auth-rule action=ADD field=* txn_type=10001 old_value=* new_value=* constraint="{"constraint_id":"OR","auth_constraints":[{"sig_count":1,"role":"101","constraint_id":"ROLE","need_to_be_owner":false}]}"
 
 ledger auth-rule action=EDIT field=* txn_type=20000 old_value=* new_value=* constraint="{"sig_count":3,"role":"0","constraint_id":"ROLE","need_to_be_owner":false}"

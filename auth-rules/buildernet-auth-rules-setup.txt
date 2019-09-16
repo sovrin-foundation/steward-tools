@@ -1,4 +1,3 @@
-load-plugin library=/Users/lynnbendixsen/github/libsovtoken/libsovtoken/target/debug/libsovtoken.so initializer=sovtoken_init
 wallet open testnet_wallet key=testnet_wallet
 did use 4TMD8bT757JqBnmoCiNCc3
 pool connect buildernet
@@ -98,14 +97,14 @@ ledger auth-rule action=ADD field=* txn_type=REVOC_REG_ENTRY old_value=* new_val
 
 ledger auth-rule action=EDIT field=* txn_type=REVOC_REG_ENTRY old_value=* new_value=* constraint="{"sig_count":1,"role":"*","constraint_id":"ROLE","need_to_be_owner":true}"
 
-ledger auth-rule action=EDIT field=* txn_type=AUTH_RULES old_value=* new_value=* constraint="{"sig_count":1,"role":"0","constraint_id":"ROLE","need_to_be_owner":false}"
+ledger auth-rule action=EDIT field=* txn_type=122 old_value=* new_value=* constraint="{"sig_count":1,"role":"0","constraint_id":"ROLE","need_to_be_owner":false}"
 
-ledger auth-rule action=ADD field=* txn_type=TRANSACTION_AUTHOR_AGREEMENT old_value=* new_value=* constraint="{"sig_count":1,"role":"0","constraint_id":"ROLE","need_to_be_owner":false}"
+ledger auth-rule action=ADD field=* txn_type=4 old_value=* new_value=* constraint="{"sig_count":1,"role":"0","constraint_id":"ROLE","need_to_be_owner":false}"
 
-ledger auth-rule action=ADD field=* txn_type=TRANSACTION_AUTHOR_AGREEMENT_AML old_value=* new_value=* constraint="{"sig_count":1,"role":"0","constraint_id":"ROLE","need_to_be_owner":false}"
+ledger auth-rule action=ADD field=* txn_type=5 old_value=* new_value=* constraint="{"sig_count":1,"role":"0","constraint_id":"ROLE","need_to_be_owner":false}"
 
-ledger auth-rule action=ADD field=* txn_type=MINT_PUBLIC old_value=* new_value=* constraint="{"sig_count":1,"role":"0","constraint_id":"ROLE","need_to_be_owner":false}"
+ledger auth-rule action=ADD field=* txn_type=10000 old_value=* new_value=* constraint="{"sig_count":1,"role":"0","constraint_id":"ROLE","need_to_be_owner":false}"
 
-ledger auth-rule action=ADD field=* txn_type=XFER_PUBLIC old_value=* new_value=* constraint="{"sig_count":0,"role":"*","metadata":{"fees":"token_xfer"},"constraint_id":"ROLE","need_to_be_owner":false}"
+ledger auth-rule action=ADD field=* txn_type=10001 old_value=* new_value=* constraint="{"constraint_id":"OR","auth_constraints":[{"sig_count":1,"role":"101","constraint_id":"ROLE","need_to_be_owner":false},{"sig_count":0,"role":"*","metadata":{"fees":"token_xfer"},"constraint_id":"ROLE","need_to_be_owner":false}]}"
 
-ledger auth-rule action=EDIT field=* txn_type=SET_FEES old_value=* new_value=* constraint="{"sig_count":1,"role":"0","constraint_id":"ROLE","need_to_be_owner":false}"
+ledger auth-rule action=EDIT field=* txn_type=20000 old_value=* new_value=* constraint="{"sig_count":1,"role":"0","constraint_id":"ROLE","need_to_be_owner":false}"

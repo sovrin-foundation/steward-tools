@@ -1,0 +1,34 @@
+pool connect buildernet
+load-plugin library=/Users/lynnbendixsen/github/libsovtoken/libsovtoken/target/debug/libsovtoken.so initializer=sovtoken_init
+wallet open testnet_wallet key=testnet_wallet
+did use 5M3i1PbpvEQmTk25EmAY6N
+ledger nym did=4TMD8bT757JqBnmoCiNCc3 verkey=~NzpgaRPVBdEqp2EhZNcJRJ role=TRUSTEE
+did use 4TMD8bT757JqBnmoCiNCc3
+ledger nym did=UBAUw6a1wauQe7Q7TBZFPX verkey=~Eca681XeE13B6TJ3DwC5Kp role=TRUSTEE
+ledger nym did=YLCJ5wri6K8asJnHdJXzDP verkey=~N1H5jgRjsb1vXdSJMxWWAr role=TRUSTEE
+ledger nym did=5b2geezoHXsyLPNeWrWpEp verkey=~RyjHoiv5YL8TBTja1vGbYB role=STEWARD
+ledger nym did=G22G7EDApri9PQSqRf1Bp9 verkey=~Fajxyn1dPEXXBUbfy122pC role=STEWARD
+ledger nym did=Y8ma12jQGnnpyEyStfkLuM verkey=~FcsGs6TKw6NFZ1WdaNFMzk role=STEWARD
+ledger nym did=6AHBxoGcE4gxUYzCtTJsV1 verkey=~WXyjh31Gc7K6xR6BBmJ4r4 role=STEWARD
+ledger nym did=NVHhz5WbbciXmdb9n11XZJ verkey=~G1t8yMqLAH96Pu59wtQbJr role=STEWARD
+ledger nym did=3rnvH5YWuYRV2AAE6V7Ch6 verkey=~JEewVSPNsFjFAfL8zxJxFW role=STEWARD
+ledger nym did=JsrVTPwaRmKZ4Byi83Aa6B verkey=~Ueojgyg55DJNehxeWKDWjM role=STEWARD
+ledger nym did=PYynHcNSenLdyMPoyLf593 verkey=~4YrXdvQ2FUGq6YWfjHuoCU role=STEWARD
+ledger nym did=X7GKaGZKHqkaB6xEaUBpLR verkey=~3ukBLMd4JKe2xp8QsUHFf1 role=STEWARD
+ledger nym did=zxn4M3R7pcU18u5H6qakn verkey=~Ayem2SgzB2qFnftgRn5SiQ role=STEWARD
+ledger nym did=CsQjETVyy3tFyEJBzSWzmN verkey=~ENQPx3JhLnoFXYP9fm7Lvk role=STEWARD
+ledger nym did=KtwgaAvifSGpfCbHUrBxaU verkey=~Vk6fzYcyVumNmXjrYofwAC role=STEWARD
+ledger nym did=MjMScF6wq7ejR7MXgVmrLH verkey=~DPuLWwtMmUanzAPPQcBa2b role=STEWARD
+
+ledger auth-rule action=ADD field=* txn_type=10000 old_value=* new_value=* constraint="{"sig_count":1,"role":"0","constraint_id":"ROLE","need_to_be_owner":false}"
+ledger auth-rule action=EDIT field=* txn_type=20000 old_value=* new_value=* constraint="{"sig_count":1,"role":"0","constraint_id":"ROLE","need_to_be_owner":false}"
+ledger set-fees-prepare payment_method=sov fees=did:5000000000,cred_def:12500000000,schema:25000000000,rev_reg:10000000000,rev_reg_update:50000000,key_rotation:500000000,attrib_add:500000000,attrib_edit:500000000,token_xfer:100000000
+ledger sign-multi
+ledger custom context
+ledger mint-prepare outputs=(pay:sov:52CuALbWKBX66sDnmf8zL5HvxFYyjzFNuaibERRNhPgKP1bBu,800000000000000000)
+ledger sign-multi
+ledger custom context
+
+ledger auth-rule action=ADD field=* txn_type=4 old_value=* new_value=* constraint="{"sig_count":1,"role":"0","constraint_id":"ROLE","need_to_be_owner":false}"
+ledger auth-rule action=ADD field=* txn_type=5 old_value=* new_value=* constraint="{"sig_count":1,"role":"0","constraint_id":"ROLE","need_to_be_owner":false}"
+ledger txn-acceptance-mechanisms aml={"product_eula":"The agreement was included in the software product’s terms and conditions as part of a license to the end user.","service_agreement":"The agreement was included in the terms and conditions the user accepted as part of contracting a service.","at_submission":"The agreement was reviewed by the user and accepted at the time of submission of this transaction.","for_session":"The agreement was reviewed by the user and accepted at some point in the user’s session prior to submission.","wallet_agreement":"The agreement was reviewed by the user and this affirmation was persisted in the user’s wallet for use during submission.","on_file":"An authorized person accepted the agreement, and such acceptance is on file with the user’s organization.","click_agreement":"The agreement was displayed and then agreed to by typing or clicking acceptance."} version=0.1 context=https://raw.githubusercontent.com/sovrin-foundation/sovrin/master/TAA/AML.md
