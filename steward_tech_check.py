@@ -93,7 +93,7 @@ rules = {
         },
         "machine_type_allowed": {
             "types": {
-                "vm": [ 'kvm','xen','vmware','virtualbox'],
+                "vm": [ 'kvm','xen','vmware','virtualbox', 'microsoft'],
                 "container": [ 'docker','lxc','podman' ],
                 "metal": [ 'hardware' ]
             }
@@ -1050,8 +1050,8 @@ class RuleValidator:
                 res['details'] = "Found a valid machine_type: {} on a valid technology: {}".format(mach_type,mach_tech)
             else:
                 res['result'] = bcolors.FAIL + "FAILED" + bcolors.ENDC
-                res['action_needed'] = "Found valid machine_type: {} running on Unsupported technology: {}".format(mach_type,mach_tech)
-                res['details'] = "Found valid machine_type: {} on unsupported technology: {}".format(mach_type,mach_tech)
+                res['action_needed'] = "Found invalid machine_type: {} running on Unsupported technology: {}".format(mach_type,mach_tech)
+                res['details'] = "Found invalid machine_type: {} on unsupported technology: {}".format(mach_type,mach_tech)
         else:
             res['result'] = bcolors.FAIL + "FAILED" + bcolors.ENDC
             res['action_needed'] = "Change to a supported machine type of: {}".format(','.join(criteria['types']))
