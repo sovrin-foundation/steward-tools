@@ -94,7 +94,7 @@ rules = {
         "machine_type_allowed": {
             "types": {
                 "vm": [ 'kvm','xen','vmware','virtualbox'],
-                "container": [ 'docker','lxc' ],
+                "container": [ 'docker','lxc','podman' ],
                 "metal": [ 'hardware' ]
             }
         },
@@ -238,8 +238,14 @@ class Node:
 
         try:
             output=subprocess.check_output("dmesg | grep 'Detected virtualization'", shell=True)
-        except: 
+        except:
             # Not a VM
+            if os.path.isfile("/run/.containerenv"):
+                self.is_container = True
+                self.mach_type = 'container'
+                self.mach_tech = 'podman'
+                return
+
             with open("/proc/1/cgroup","r") as cg:
                 for l in cg.readlines():
                     lsplit = l.strip().split(':')
@@ -250,7 +256,7 @@ class Node:
                         return
                 self.is_container = True
                 self.mach_type = 'container'
-                self.mach_tech = lsplit[2].split('/')[1]                        
+                self.mach_tech = lsplit[2].split('/')[1]
         else:
             outstr=output.decode()
             match = re.search("Detected virtualization (.*)\.", outstr)
