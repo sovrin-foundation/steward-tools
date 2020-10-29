@@ -1140,24 +1140,28 @@ class RuleValidator:
             'details': [],
             'comment': 'None'
         }
-        cur_procs = self.node.running_procs()
-        failed = False
-        for processes in criteria['processes']:
-            fp = False
-            for cp in cur_procs:
-                if isinstance(processes, str):
-                    processes = [processes]
-                if cp['cmd'].split()[0] in processes:
-                    fp = True
-                    res['details'].append('Found required proc: {} at pid: {}'.format(cp['cmd'],cp['pid']))
-                    break
-            if not fp:
-                failed = True
-                res['result'] = bcolors.FAIL + 'FAILED' + bcolors.ENDC
-                res['action_needed'].append("Start required process: {}".format(', '.join(processes)))
-                res['details'].append("Can't find required process: {}".format(', '.join(processes)))
-        if not failed:
-            res['result'] = bcolors.OKGREEN + "PASSED" + bcolors.ENDC
+        if self.node.mach_type == 'container':
+            res['action_needed'].append("Verify that the host system has proper time synchronisation")
+            res['details'].append("Containers use the clock of their host")
+        else:
+            cur_procs = self.node.running_procs()
+            failed = False
+            for processes in criteria['processes']:
+                fp = False
+                for cp in cur_procs:
+                    if isinstance(processes, str):
+                        processes = [processes]
+                    if cp['cmd'].split()[0] in processes:
+                        fp = True
+                        res['details'].append('Found required proc: {} at pid: {}'.format(cp['cmd'],cp['pid']))
+                        break
+                if not fp:
+                    failed = True
+                    res['result'] = bcolors.FAIL + 'FAILED' + bcolors.ENDC
+                    res['action_needed'].append("Start required process: {}".format(', '.join(processes)))
+                    res['details'].append("Can't find required process: {}".format(', '.join(processes)))
+            if not failed:
+                res['result'] = bcolors.OKGREEN + "PASSED" + bcolors.ENDC
         return res
 
 if __name__ == '__main__':
