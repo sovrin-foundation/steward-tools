@@ -4,7 +4,7 @@ from getpass import getpass
 from indy.error import IndyError, ErrorCode
 from indy import wallet, ledger, payment, pool
 from constants import PAYMENT_METHOD, POOL_NAME, PROTOCOL_VERSION
-from utils import run_coroutine, run_array
+from utils import run_coroutine
 
 
 def open_wallet(wallet_info) -> int:
@@ -116,21 +116,12 @@ def get_payment_sources(pool_handle: int, payment_address: str):
         handle_payment_error(err)
 
 
-def verify_payment_on_ledger(pool_handle, receipts):
+def verify_payment_on_ledger(pool_handle, receipt):
     try:
-        requests = run_array(
-            [payment.build_verify_payment_req(-1, None, receipt) for receipt in receipts])
-
-        responses = run_array(
-            [ledger.submit_request(pool_handle, list(request.result())[0]) for request in requests[0]])
-
-        results = run_array(
-            [payment.parse_verify_payment_response(PAYMENT_METHOD, response.result()) for response in responses[0]])
-
-        for receipt in [result.result() for result in results[0]]:
-            if len(json.loads(receipt)['sources']) == 0:
-                raise Exception('Payment failed')
-        return
+        request, _ = run_coroutine(payment.build_verify_payment_req(-1, None, receipt))
+        response = run_coroutine(ledger.submit_request(pool_handle, request))
+        receipts = run_coroutine(payment.parse_verify_payment_response(PAYMENT_METHOD, response))
+        return json.loads(receipts)
     except IndyError as err:
         handle_payment_error(err)
 
