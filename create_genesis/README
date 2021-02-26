@@ -1,4 +1,4 @@
-Use genesis_from_files.py to greate genesis files (domain and pool) for a validator
+Use genesis_from_files.py to create genesis files (domain and pool) for a validator
 pool. The values of the keys, names, etc. can be completely arbitrary, so this
 utility is useful for creating genesis files for actual, rather than test pools
 with fixed keys and names.
