@@ -534,7 +534,7 @@ class Node:
                                 proto = proto.rstrip('6')
                             local = False
                             lface = lsplit[3].split(':')
-                            iface = ':'.join(lface[:-1])
+                            iface = ':'.join(lface[:-1]).split('%')[0]
                             port = lface[-1]
                             if lsplit[5] in [ 'LISTEN', 'UNCONN']:
                                 prog_pid = ' '.join(lsplit[6:]).split('/')
