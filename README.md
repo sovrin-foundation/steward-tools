@@ -1,2 +1,2 @@
 # steward-tools
-tools for Sovrin steward
+Tools for Sovrin steward
