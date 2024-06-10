@@ -100,10 +100,10 @@ rules = {
         },
         "machine_resources_required": {
             "resources": {
-                "memory": ">= 32000000000",
+                "memory": ">= 8000000000",
                 "disk": {
                     'path': "/var/lib/indy",
-                    'size': ">= 1000000000000",
+                    'size': ">= 250000000000",
                     'raid': True
                 },
                 'hardware': 'attested',
@@ -269,7 +269,8 @@ class Node:
             self.mach_type = 'vm'
 
 
-    def _address_in_network(self,ip, net):
+    def _address_in_network(self, ip, net):
+        ip = ip.split('%')[0]
         ipaddr = int(''.join([ '%02x' % int(x) for x in ip.split('.') ]), 16)
         netstr, bits = net.split('/')
         netaddr = int(''.join([ '%02x' % int(x) for x in netstr.split('.') ]), 16)
