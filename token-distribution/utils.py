@@ -32,10 +32,6 @@ def run_coroutine(coroutine):
     return loop.run_until_complete(coroutine)
 
 
-def run_array(array: list):
-    return run_coroutine(asyncio.wait(array))
-
-
 def read_file(data_file):
     with open(data_file, newline='') as data_file:
         return data_file.read()
