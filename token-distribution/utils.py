@@ -6,6 +6,8 @@ from pathlib import Path
 import csv
 import os
 import zipfile
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 from constants import LIBRARY
 
@@ -75,16 +77,20 @@ def send_email(from_, targets, subject_, password):
         return
 
     for target in targets:
-        email_text = """\n\
-        From: %s
-        To: %s
-        Subject: %s
+        message = MIMEMultipart()
 
+        message['From'] = from_
+        message['To'] = target['to']
+        message['Subject'] = subject_
+
+        email_text = """\
         %s
-        """ % (from_, target['to'], subject_, target['body'])
+            """ % (target['body'])
+
+        message.attach(MIMEText(email_text, 'plain'))
 
         try:
-            server.sendmail(from_, target['to'], email_text)
+            server.sendmail(from_, target['to'], message.as_string())
             print("Mail has been successfully sent to {}".format(target['to']))
         except Exception as err:
             print("Sending email failed to {} with " + str(err))
